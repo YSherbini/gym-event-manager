@@ -2,6 +2,7 @@ import { Router } from "express";
 import Event from "../models/event.mjs";
 import auth from '../middleware/auth.mjs'
 import Category from "../models/category.mjs";
+import Register from "../models/register.mjs";
 const router = new Router()
 
 // Read events
@@ -12,7 +13,7 @@ router.get('/events', auth, async (req, res) => {
         match['categoriesIds'] = await Category.findOne({ name: req.query.category.toLowerCase() })
     }
     try {
-        const events = await Event.find(match).populate('categories')
+        const events = await Event.find(match)
         res.send(events)
     } catch (err) {
         res.status(400).send(err)
@@ -22,9 +23,13 @@ router.get('/events', auth, async (req, res) => {
 // GET event by id
 router.get('/events/:id', auth, async (req, res) => {
     try {
-        const event = await Event.findById({_id: req.params.id}).populate('categories')
+        const register = await Register.findOne({ eventId: req.params.id, gymOwnerId: req.gymOwner._id })
+        const event = await Event.findById({_id: req.params.id}).populate('categories teams')
+        if (register) {
+            return res.send({...event.toObject(), registerId: register._id})
+        }
         if (!event) {
-            throw Error('No such event')
+            return res.status(404).send('Event not found!')
         }
         res.send(event)
     } catch (err) {

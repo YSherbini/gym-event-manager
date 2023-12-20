@@ -19,6 +19,16 @@ const teamSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'GymOwner',
         required: true
+    },
+    registerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Register',
+        required: true
+    },
+    eventId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Event',
+        required: true
     }
 },
 {
@@ -29,7 +39,22 @@ const teamSchema = new mongoose.Schema({
 teamSchema.virtual('category', {
     ref: 'Category',
     localField: 'categoryId',
-    foreignField: '_id'
+    foreignField: '_id',
+    justOne: true
+})
+
+teamSchema.virtual('register', {
+    ref: 'Register',
+    localField: 'registerId',
+    foreignField: '_id',
+    justOne: true
+})
+
+teamSchema.virtual('event', {
+    ref: 'Event',
+    localField: 'eventId',
+    foreignField: '_id',
+    justOne: true
 })
 
 const Team = mongoose.model('Team', teamSchema)

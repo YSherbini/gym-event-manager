@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Team from "./team.mjs";
 
 const registerSchema = new mongoose.Schema({
     eventId: {
@@ -11,12 +12,6 @@ const registerSchema = new mongoose.Schema({
         ref: 'GymOwner',
         required: true
     },
-    teamsIds: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Team',
-        }
-    ],
 },
 {
     toJSON: {virtuals: true},
@@ -25,8 +20,8 @@ const registerSchema = new mongoose.Schema({
 
 registerSchema.virtual('teams', {
     ref: 'Team',
-    localField: 'teamsIds',
-    foreignField: '_id'
+    localField: '_id',
+    foreignField: 'registerId'
 })
 
 registerSchema.virtual('event', {
@@ -36,6 +31,12 @@ registerSchema.virtual('event', {
     justOne: true
 })
 
-const register = mongoose.model('register', registerSchema)
+registerSchema.pre('remove', async function (next) {
+    const register = this
+    await Team.deleteMany({ registerId: register._id })
+    next()
+})
 
-export default register
+const Register = mongoose.model('Register', registerSchema)
+
+export default Register

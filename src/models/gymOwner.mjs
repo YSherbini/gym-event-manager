@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import 'dotenv/config'
 import Team from './team.mjs'
-import register from './register.mjs'
+import Register from './register.mjs'
 
 const gymOwnerSchema = new mongoose.Schema({
     name: {
@@ -46,6 +46,11 @@ const gymOwnerSchema = new mongoose.Schema({
     }]
 })
 
+gymOwnerSchema.virtual('teams', {
+    ref: 'Team',
+    localField: '_id',
+    foreignField: 'gymOwnerId'
+})
 
 gymOwnerSchema.methods.toJSON = function() {
     const gymOwner = this
@@ -75,12 +80,6 @@ gymOwnerSchema.methods.generateAuthToken = async function () {
     return token
 }
 
-gymOwnerSchema.virtual('teams', {
-    ref: 'Team',
-    localField: '_id',
-    foreignField: 'gymOwnerId'
-})
-
 gymOwnerSchema.pre('save', async function (next) {
     const gymOwner = this
     if (gymOwner.isModified('password')) {
@@ -89,10 +88,10 @@ gymOwnerSchema.pre('save', async function (next) {
     next()
 })
 
-gymOwnerSchema.pre('delete', async function (next) {
+gymOwnerSchema.pre('remove', async function (next) {
     const gymOwner = this
     await Team.deleteMany({ gymOwnerId: gymOwner._id })
-    await register.deleteMany({ gymOwnerId: gymOwner._id })
+    await Register.deleteMany({ gymOwnerId: gymOwner._id })
     next()
 })
 

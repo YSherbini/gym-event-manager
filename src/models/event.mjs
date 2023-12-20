@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import register from './register.mjs'
+import Register from './register.mjs'
 
 const eventSchema = new mongoose.Schema({
     name: {
@@ -24,21 +24,21 @@ const eventSchema = new mongoose.Schema({
     toObject: {virtuals: true}
 })
 
-eventSchema.virtual('registers', {
-    ref: 'register',
-    localField: '_id',
-    foreignField: 'eventId'
-})
-
 eventSchema.virtual('categories', {
     ref: 'Category',
     localField: 'categoriesIds',
     foreignField: '_id'
 })
 
+eventSchema.virtual('teams', {
+    ref: 'Team',
+    localField: '_id',
+    foreignField: 'eventId'
+})
+
 eventSchema.pre('delete', async function (next) {
     const event = this
-    await register.deleteMany({ eventId: event._id })
+    await Register.deleteMany({ eventId: event._id })
     next()
 })
 

@@ -6,7 +6,7 @@ import 'dotenv/config';
 import Event from './models/event.mjs'
 import GymOwner from './models/gymOwner.mjs'
 import Team from './models/team.mjs'
-import register from "./models/register.mjs";
+import Register from "./models/register.mjs";
 import Category from "./models/category.mjs";
 import "./db/mongoose.mjs";
 import gymOwnerRouter from './routers/gymOwner.mjs';
@@ -36,7 +36,7 @@ const start = async () => {
         resources: [
             Event,
             Team,
-            register,
+            Register,
             Category,
             {
                 resource: GymOwner,
