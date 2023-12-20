@@ -27,7 +27,7 @@ router.post('/gymOwners/login', async (req, res) => {
 })
 
 // Logout
-router.post('/gymOwners/logout', auth, async (req, res) => {
+router.delete('/gymOwners/logout', auth, async (req, res) => {
     try {
         req.gymOwner.tokens = req.gymOwner.tokens.filter((token) => token.token !== req.token)
         await req.gymOwner.save()
