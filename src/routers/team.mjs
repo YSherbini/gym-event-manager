@@ -23,7 +23,6 @@ router.post('/teams',auth, async (req, res) => {
             eventId: register.eventId
         })
         await team.save()
-        await team.populate('category').execPopulate()
         res.status(201).send(team)
     } catch (err) {
         res.status(400).send(err)
@@ -47,7 +46,6 @@ router.get('/teams', auth, async (req, res) => {
     try {
         await req.gymOwner.populate({
             path: 'teams',
-            populate: 'category',
             match,
             options: {
                 limit: parseInt(req.query.limit),
@@ -93,7 +91,6 @@ router.patch('/teams/:id', auth, async (req, res) => {
         }
         updates.forEach((update) => team[update] = req.body[update])
         await team.save()
-        await team.populate('category').execPopulate()
         res.send(team)
     } catch (err) {
         res.status(400).send(err)
