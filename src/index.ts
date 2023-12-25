@@ -2,19 +2,19 @@ import express from "express";
 import AdminJS from 'adminjs'
 import AdminJSExpress from "@adminjs/express";
 import * as AdminJSMongoose from "@adminjs/mongoose";
-import 'dotenv/config';
-import Event from './models/event.mjs'
-import GymOwner from './models/gymOwner.mjs'
-import Team from './models/team.mjs'
-import Register from "./models/register.mjs";
-import Category from "./models/category.mjs";
-import "./db/mongoose.mjs";
-import gymOwnerRouter from './routers/gymOwner.mjs';
-import teamRouter from './routers/team.mjs'
-import registerRouter from './routers/register.mjs'
-import eventRouter from './routers/event.mjs'
-import categoryRouter from './routers/category.mjs'
-
+import * as dotenv from 'dotenv';
+import Event from './models/event.js'
+import GymOwner from './models/gymOwner.js'
+import Team from './models/team.js'
+import Register from "./models/register.js";
+import Category from "./models/category.js";
+import "./db/mongoose.js";
+import gymOwnerRouter from './routers/gymOwner.js';
+import teamRouter from './routers/team.js'
+import registerRouter from './routers/register.js'
+import eventRouter from './routers/event.js'
+import categoryRouter from './routers/category.js'
+dotenv.config()
 AdminJS.registerAdapter({
     Resource: AdminJSMongoose.Resource,
     Database: AdminJSMongoose.Database,
