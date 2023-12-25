@@ -18,7 +18,7 @@ router.post('/registers', auth, async (req, res) => {
             throw new Error('Already regestered!');
         }
         await register.save();
-        await register.populate('event').execPopulate();
+        await register.populate('event', "-__v").execPopulate();
         res.status(201).send(register);
     }
     catch (err) {
@@ -39,7 +39,7 @@ router.get('/registers', auth, async (req, res) => {
         // if (typeof categoryId === "string" && categoryId != "") {
         //     match['event'] = { categoriesIds: { categoryId: categoryId }}
         // }
-        let registers = await Register.find({ gymOwnerId: req.gymOwner._id }).populate('event');
+        let registers = await Register.find({ gymOwnerId: req.gymOwner._id }).populate('event', "-__v");
         registers = registers.filter((register) => {
             const event = register.event;
             if (typeof name === 'string') {
@@ -68,7 +68,7 @@ router.get('/registers/:id', auth, isValidObjectId, async (req, res) => {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available');
         }
-        const register = await Register.findOne({ _id: req.params.id, gymOwnerId: req.gymOwner._id }).populate('teams event');
+        const register = await Register.findOne({ _id: req.params.id, gymOwnerId: req.gymOwner._id }).populate('teams event', "-__v");
         if (!register) {
             return res.status(404).send('Register not found!');
         }

@@ -31,8 +31,8 @@ router.get('/events/:id', auth, isValidObjectId, async (req: MyRequest, res) => 
         if (typeof req.gymOwner === 'undefined') {
             return res.status(500).send()
         }
-        const register = await Register.findOne({ eventId: req.params.id, gymOwnerId: req.gymOwner._id }).populate('teams')
-        const event = await Event.findById({_id: req.params.id}).populate('categories')
+        const register = await Register.findOne({ eventId: req.params.id, gymOwnerId: req.gymOwner._id }).populate('teams', "-__v")
+        const event = await Event.findById({_id: req.params.id}).populate('categories', "-__v")
         if (register && event) {
             return res.send({...event.toObject(), registerId: register._id, teams: register.teams})
         }

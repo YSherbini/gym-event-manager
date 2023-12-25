@@ -75,7 +75,7 @@ router.get('/teams/:id', auth, isValidObjectId, async (req: MyRequest, res) => {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available')
         }
-        const team = await Team.findOne({ _id: req.params.id, gymOwnerId: req.gymOwner._id }).populate('category event')
+        const team = await Team.findOne({ _id: req.params.id, gymOwnerId: req.gymOwner._id }).populate('category event', "-__v")
         if (!team) {
             return res.status(404).send('Team not found!')
         }
