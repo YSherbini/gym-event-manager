@@ -6,6 +6,12 @@ const categorySchema = new mongoose.Schema({
         trim: true,
     },
 });
+categorySchema.methods.toJSON = function () {
+    const category = this;
+    const categoryObject = category.toObject();
+    delete categoryObject.__v;
+    return categoryObject;
+};
 const Category = mongoose.model('Category', categorySchema);
 export default Category;
 //# sourceMappingURL=category.js.map

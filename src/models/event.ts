@@ -29,6 +29,13 @@ const eventSchema = new mongoose.Schema({
     toObject: {virtuals: true}
 })
 
+eventSchema.methods.toJSON = function() {
+    const event = this as IEvent
+    const eventObject: any = event.toObject()
+    delete eventObject.__v
+    return eventObject
+}
+
 eventSchema.virtual('categories', {
     ref: 'Category',
     localField: 'categoriesIds',

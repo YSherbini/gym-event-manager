@@ -32,6 +32,13 @@ registerSchema.virtual('event', {
     justOne: true
 })
 
+registerSchema.methods.toJSON = function() {
+    const register = this as IRegister
+    const registerObject: any = register.toObject()
+    delete registerObject.__v
+    return registerObject
+}
+
 registerSchema.post('remove', async function (register, next) {
     await Team.deleteMany({ registerId: register._id })
     next()

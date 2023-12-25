@@ -41,6 +41,7 @@ gymOwnerSchema.methods.toJSON = function () {
     const gymOwnerObject = gymOwner.toObject();
     delete gymOwnerObject.password;
     delete gymOwnerObject.tokens;
+    delete gymOwnerObject.__v;
     return gymOwnerObject;
 };
 // gymOwnerSchema.pre('save', async function (this: IGymOwner, next) {

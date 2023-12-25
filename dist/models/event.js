@@ -25,6 +25,12 @@ const eventSchema = new mongoose.Schema({
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 });
+eventSchema.methods.toJSON = function () {
+    const event = this;
+    const eventObject = event.toObject();
+    delete eventObject.__v;
+    return eventObject;
+};
 eventSchema.virtual('categories', {
     ref: 'Category',
     localField: 'categoriesIds',

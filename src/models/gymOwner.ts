@@ -45,6 +45,7 @@ gymOwnerSchema.methods.toJSON = function() {
     const gymOwnerObject: any = gymOwner.toObject()
     delete gymOwnerObject.password
     delete gymOwnerObject.tokens
+    delete gymOwnerObject.__v
     return gymOwnerObject
 }
 

@@ -1,3 +1,4 @@
+import { ITeam } from "interfaces/Team.interface.js";
 import mongoose from "mongoose";
 
 const teamSchema = new mongoose.Schema({
@@ -56,6 +57,13 @@ teamSchema.virtual('event', {
     foreignField: '_id',
     justOne: true
 })
+
+teamSchema.methods.toJSON = function() {
+    const team = this as ITeam
+    const teamObject: any = team.toObject()
+    delete teamObject.__v
+    return teamObject
+}
 
 const Team = mongoose.model('Team', teamSchema)
 

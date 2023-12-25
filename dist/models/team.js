@@ -51,6 +51,12 @@ teamSchema.virtual('event', {
     foreignField: '_id',
     justOne: true
 });
+teamSchema.methods.toJSON = function () {
+    const team = this;
+    const teamObject = team.toObject();
+    delete teamObject.__v;
+    return teamObject;
+};
 const Team = mongoose.model('Team', teamSchema);
 export default Team;
 //# sourceMappingURL=team.js.map

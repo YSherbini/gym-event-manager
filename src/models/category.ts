@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { ICategory } from "../interfaces/Category.interface.js";
+
 
 const categorySchema = new mongoose.Schema({
     name: {
@@ -8,6 +10,13 @@ const categorySchema = new mongoose.Schema({
     },
 })
 
-const Category = mongoose.model('Category', categorySchema)
+categorySchema.methods.toJSON = function() {
+    const category = this as ICategory
+    const categoryObject: any = category.toObject()
+    delete categoryObject.__v
+    return categoryObject
+}
+
+const Category = mongoose.model<ICategory>('Category', categorySchema)
 
 export default Category
