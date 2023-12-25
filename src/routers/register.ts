@@ -3,6 +3,7 @@ import Register from "../models/register.js";
 import auth from '../middleware/auth.js'
 import { MyRequest } from "../interfaces/MyRequest.js";
 import { IRegister } from "../interfaces/Register.interface.js";
+import { isValidObjectId } from "../middleware/validate.js";
 const router = Router()
 
 // register
@@ -61,7 +62,7 @@ router.get('/registers', auth, async (req: MyRequest, res) => {
 })
 
 // Get register/registerd teams
-router.get('/registers/:id', auth, async (req: MyRequest, res) => {
+router.get('/registers/:id', auth, isValidObjectId, async (req: MyRequest, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available')
@@ -77,7 +78,7 @@ router.get('/registers/:id', auth, async (req: MyRequest, res) => {
 })
 
 // Delete register
-router.delete('/registers/:id', auth, async (req: MyRequest, res) => {
+router.delete('/registers/:id', auth, isValidObjectId, async (req: MyRequest, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available')

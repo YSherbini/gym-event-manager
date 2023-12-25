@@ -3,6 +3,7 @@ import Team from '../models/team.js'
 import auth from '../middleware/auth.js'
 import Register from "../models/register.js";
 import { MyRequest } from "../interfaces/MyRequest.js";
+import { isValidObjectId } from "../middleware/validate.js";
 const router = Router()
 
 // Create team
@@ -69,7 +70,7 @@ router.get('/teams', auth, async (req: MyRequest, res) => {
 })
 
 // Read team by ID
-router.get('/teams/:id', auth, async (req: MyRequest, res) => {
+router.get('/teams/:id', auth, isValidObjectId, async (req: MyRequest, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available')
@@ -85,7 +86,7 @@ router.get('/teams/:id', auth, async (req: MyRequest, res) => {
 })
 
 // Update team by ID
-router.patch('/teams/:id', auth, async (req: MyRequest, res) => {
+router.patch('/teams/:id', auth, isValidObjectId, async (req: MyRequest, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['name', 'categoryId', 'image']
     const isValidOp = updates.every((update) => allowedUpdates.includes(update))
@@ -113,7 +114,7 @@ router.patch('/teams/:id', auth, async (req: MyRequest, res) => {
 })
 
 // Delete team by ID
-router.delete('/teams/:id', auth, async (req: MyRequest, res) => {
+router.delete('/teams/:id', auth, isValidObjectId, async (req: MyRequest, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available')

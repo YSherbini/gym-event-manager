@@ -55,4 +55,12 @@ export const checkExistingEmailForUpdate = async (req, res, next) => {
         res.status(500).json({ error: 'Database error' });
     }
 };
+export const isValidObjectId = (req, res, next) => {
+    const { id } = req.params;
+    if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+        return res.status(400).json({ error: 'Invalid ObjectId' });
+        ;
+    }
+    next();
+};
 //# sourceMappingURL=validate.js.map

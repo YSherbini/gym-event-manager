@@ -1,6 +1,7 @@
 import { Router } from "express";
 import auth from '../middleware/auth.js'
 import Category from "../models/category.js";
+import { isValidObjectId } from "../middleware/validate.js";
 const router = Router()
 
 // Read categories
@@ -14,7 +15,7 @@ router.get('/categories', auth, async (req, res) => {
 })
 
 // GET category by id
-router.get('/categories/:id', auth, async (req, res) => {
+router.get('/categories/:id', auth, isValidObjectId, async (req, res) => {
     try {
         const category = await Category.findById({_id: req.params.id})
         if (!category) {

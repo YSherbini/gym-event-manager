@@ -3,6 +3,7 @@ import Event from "../models/event.js";
 import auth from '../middleware/auth.js'
 import Register from "../models/register.js";
 import { MyRequest } from "../interfaces/MyRequest.js";
+import { isValidObjectId } from "../middleware/validate.js";
 const router = Router()
 
 // Read events
@@ -25,7 +26,7 @@ router.get('/events', auth, async (req, res) => {
 })
 
 // GET event by id
-router.get('/events/:id', auth, async (req: MyRequest, res) => {
+router.get('/events/:id', auth, isValidObjectId, async (req: MyRequest, res) => {
     try {
         if (typeof req.gymOwner === 'undefined') {
             return res.status(500).send()

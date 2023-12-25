@@ -1,6 +1,7 @@
 import { Router } from "express";
 import Register from "../models/register.js";
 import auth from '../middleware/auth.js';
+import { isValidObjectId } from "../middleware/validate.js";
 const router = Router();
 // register
 router.post('/registers', auth, async (req, res) => {
@@ -62,7 +63,7 @@ router.get('/registers', auth, async (req, res) => {
     }
 });
 // Get register/registerd teams
-router.get('/registers/:id', auth, async (req, res) => {
+router.get('/registers/:id', auth, isValidObjectId, async (req, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available');
@@ -78,7 +79,7 @@ router.get('/registers/:id', auth, async (req, res) => {
     }
 });
 // Delete register
-router.delete('/registers/:id', auth, async (req, res) => {
+router.delete('/registers/:id', auth, isValidObjectId, async (req, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available');
