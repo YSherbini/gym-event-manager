@@ -65,6 +65,6 @@ teamSchema.methods.toJSON = function() {
     return teamObject
 }
 
-const Team = mongoose.model('Team', teamSchema)
+const Team = mongoose.model<ITeam>('Team', teamSchema)
 
 export default Team

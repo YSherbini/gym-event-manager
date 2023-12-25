@@ -84,25 +84,28 @@ router.get('/teams/:id', auth, isValidObjectId, async (req, res) => {
 });
 // Update team by ID
 router.patch('/teams/:id', auth, isValidObjectId, async (req, res) => {
-    const updates = Object.keys(req.body);
-    const allowedUpdates = ['name', 'categoryId', 'image'];
-    const isValidOp = updates.every((update) => allowedUpdates.includes(update));
-    if (!isValidOp) {
-        return res.status(400).send();
-    }
+    const updates = req.body;
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available');
         }
         const team = await Team.findOne({ _id: req.params.id, gymOwnerId: req.gymOwner._id });
+        if (!team) {
+            return res.status(404).send();
+        }
         const register = await Register.findOne({ _id: team.registerId, gymOwnerId: req.gymOwner._id }).populate('event');
-        if (!team || !register) {
+        if (!register) {
             return res.status(404).send();
         }
         if (req.body.categoryId && register.event && !register.event.categoriesIds.includes(req.body.categoryId)) {
             return res.status(400).send('Categories doesnt match!');
         }
-        updates.forEach((update) => team[update] = req.body[update]);
+        Object.keys(updates).forEach((field) => {
+            const fieldValue = updates[field];
+            if (fieldValue !== undefined) {
+                team[field] = fieldValue;
+            }
+        });
         await team.save();
         res.send(team);
     }

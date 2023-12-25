@@ -4,10 +4,11 @@ import auth from '../middleware/auth.js'
 import Register from "../models/register.js";
 import { MyRequest } from "../interfaces/MyRequest.js";
 import { isValidObjectId } from "../middleware/validate.js";
+import { ITeam } from "../interfaces/Team.interface.js";
 const router = Router()
 
 // Create team
-router.post('/teams',auth, async (req: MyRequest, res) => {
+router.post('/teams', auth, async (req: MyRequest, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send()
@@ -38,15 +39,15 @@ router.post('/teams',auth, async (req: MyRequest, res) => {
 // GET /teams?limit=10&skip=0
 // GET /teams?sortBy=createdAt:asc
 router.get('/teams', auth, async (req: MyRequest, res) => {
-    const match: {categoryId?: string} = {}
-    const sort: {sortBy?: number} = {}
+    const match: { categoryId?: string } = {}
+    const sort: { sortBy?: number } = {}
     if (typeof req.query.categoryId === 'string') {
         match.categoryId = req.query.categoryId
     }
     if (req.query.sortBy) {
         if (typeof req.query.sortBy === 'string') {
             const [sortBy, order] = req.query.sortBy.split(':')
-            
+
             sort.sortBy = order === 'desc' ? -1 : 1
         }
     }
@@ -87,26 +88,28 @@ router.get('/teams/:id', auth, isValidObjectId, async (req: MyRequest, res) => {
 
 // Update team by ID
 router.patch('/teams/:id', auth, isValidObjectId, async (req: MyRequest, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['name', 'categoryId', 'image']
-    const isValidOp = updates.every((update) => allowedUpdates.includes(update))
-    if (!isValidOp) {
-        return res.status(400).send()
-    }
+    const updates = req.body
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available')
         }
         const team = await Team.findOne({ _id: req.params.id, gymOwnerId: req.gymOwner._id })
+        if (!team) {
+            return res.status(404).send()
+        }
         const register = await Register.findOne({ _id: team.registerId, gymOwnerId: req.gymOwner._id }).populate('event')
-        if (!team || !register) {
+        if (!register) {
             return res.status(404).send()
         }
         if (req.body.categoryId && register.event && !register.event.categoriesIds.includes(req.body.categoryId)) {
             return res.status(400).send('Categories doesnt match!')
         }
-        updates.forEach((update) => team[update] = req.body[update])
-        await team.save()
+        Object.keys(updates).forEach((field) => {
+            const fieldValue = updates[field];
+            if (fieldValue !== undefined) {
+                (team as any)[field] = fieldValue;
+            }
+        }); await team.save()
         res.send(team)
     } catch (err: any) {
         res.status(400).send({ error: err.message })
