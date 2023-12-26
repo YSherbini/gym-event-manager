@@ -4,8 +4,7 @@ import auth from '../middleware/auth.js';
 import Register from "../models/register.js";
 import { isValidObjectId } from "../middleware/validate.js";
 const router = Router();
-// Read events
-// GET /events?category=Football
+// GET /events?category=Football&name=championship
 router.get('/events', auth, async (req, res) => {
     try {
         const { name, categoryId } = req.query;
@@ -23,21 +22,17 @@ router.get('/events', auth, async (req, res) => {
         res.status(400).send(err);
     }
 });
-// GET event by id
 router.get('/events/:id', auth, isValidObjectId, async (req, res) => {
     try {
         if (typeof req.gymOwner === 'undefined') {
-            return res.status(500).send();
+            return res.status(400).send();
         }
         const register = await Register.findOne({ eventId: req.params.id, gymOwnerId: req.gymOwner._id }).populate('teams', "-__v");
         const event = await Event.findById({ _id: req.params.id }).populate('categories', "-__v");
-        if (register && event) {
-            return res.send({ ...event.toObject(), registerId: register._id, teams: register.teams });
-        }
         if (!event) {
             return res.status(404).send('Event not found!');
         }
-        res.send(event);
+        return res.send({ ...event.toObject(), registerId: register?._id, teams: register?.teams });
     }
     catch (err) {
         res.status(400).send(err);

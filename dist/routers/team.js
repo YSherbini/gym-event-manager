@@ -4,7 +4,6 @@ import auth from '../middleware/auth.js';
 import Register from "../models/register.js";
 import { isValidObjectId } from "../middleware/validate.js";
 const router = Router();
-// Create team
 router.post('/teams', auth, async (req, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
@@ -31,10 +30,7 @@ router.post('/teams', auth, async (req, res) => {
         res.status(400).send({ error: err.message });
     }
 });
-// Read my teams
-// GET /teams?category=Football
-// GET /teams?limit=10&skip=0
-// GET /teams?sortBy=createdAt:asc
+// GET /teams?category=Football&limit=10&skip=0&sortBy=createdAt:asc
 router.get('/teams', auth, async (req, res) => {
     const match = {};
     const sort = {};
@@ -66,13 +62,12 @@ router.get('/teams', auth, async (req, res) => {
         res.status(400).send({ error: err.message });
     }
 });
-// Read team by ID
 router.get('/teams/:id', auth, isValidObjectId, async (req, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available');
         }
-        const team = await Team.findOne({ _id: req.params.id, gymOwnerId: req.gymOwner._id }).populate('category event', "-__v");
+        const team = await Team.findOne({ _id: req.params.id }).populate('category event', "-__v");
         if (!team) {
             return res.status(404).send('Team not found!');
         }
@@ -82,22 +77,17 @@ router.get('/teams/:id', auth, isValidObjectId, async (req, res) => {
         res.status(400).send({ error: err.message });
     }
 });
-// Update team by ID
 router.patch('/teams/:id', auth, isValidObjectId, async (req, res) => {
     const updates = req.body;
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available');
         }
-        const team = await Team.findOne({ _id: req.params.id, gymOwnerId: req.gymOwner._id });
+        const team = await Team.findOne({ _id: req.params.id, gymOwnerId: req.gymOwner._id }).populate('event');
         if (!team) {
             return res.status(404).send();
         }
-        const register = await Register.findOne({ _id: team.registerId, gymOwnerId: req.gymOwner._id }).populate('event');
-        if (!register) {
-            return res.status(404).send();
-        }
-        if (req.body.categoryId && register.event && !register.event.categoriesIds.includes(req.body.categoryId)) {
+        if (req.body.categoryId && team.event && !team.event.categoriesIds.includes(req.body.categoryId)) {
             return res.status(400).send('Categories doesnt match!');
         }
         Object.keys(updates).forEach((field) => {
@@ -113,7 +103,6 @@ router.patch('/teams/:id', auth, isValidObjectId, async (req, res) => {
         res.status(400).send({ error: err.message });
     }
 });
-// Delete team by ID
 router.delete('/teams/:id', auth, isValidObjectId, async (req, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
@@ -126,7 +115,7 @@ router.delete('/teams/:id', auth, isValidObjectId, async (req, res) => {
         res.send();
     }
     catch (err) {
-        res.status(500).send({ error: err.message });
+        res.status(400).send({ error: err.message });
     }
 });
 export default router;

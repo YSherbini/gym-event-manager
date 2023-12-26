@@ -3,7 +3,6 @@ import Register from "../models/register.js";
 import auth from '../middleware/auth.js';
 import { isValidObjectId } from "../middleware/validate.js";
 const router = Router();
-// register
 router.post('/registers', auth, async (req, res) => {
     if (typeof req.gymOwner === "undefined") {
         return res.status(400).send();
@@ -25,20 +24,12 @@ router.post('/registers', auth, async (req, res) => {
         res.status(400).send({ error: err.message });
     }
 });
-// Get registers
 router.get('/registers', auth, async (req, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available');
         }
         const { name, categoryId } = req.query;
-        // const match: any = {gymOwnerId: req.gymOwner._id}
-        // if (typeof name === 'string') {
-        //     match['event'] = {name: {$regex: new RegExp(name, 'i')}}
-        // }
-        // if (typeof categoryId === "string" && categoryId != "") {
-        //     match['event'] = { categoriesIds: { categoryId: categoryId }}
-        // }
         let registers = await Register.find({ gymOwnerId: req.gymOwner._id }).populate('event', "-__v");
         registers = registers.filter((register) => {
             const event = register.event;
@@ -62,7 +53,6 @@ router.get('/registers', auth, async (req, res) => {
         res.status(400).send({ error: err.message });
     }
 });
-// Get register/registerd teams
 router.get('/registers/:id', auth, isValidObjectId, async (req, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
@@ -78,7 +68,6 @@ router.get('/registers/:id', auth, isValidObjectId, async (req, res) => {
         res.status(400).send({ error: err.message });
     }
 });
-// Delete register
 router.delete('/registers/:id', auth, isValidObjectId, async (req, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
@@ -92,7 +81,7 @@ router.delete('/registers/:id', auth, isValidObjectId, async (req, res) => {
         res.send();
     }
     catch (err) {
-        res.status(500).send({ error: err.message });
+        res.status(400).send({ error: err.message });
     }
 });
 export default router;

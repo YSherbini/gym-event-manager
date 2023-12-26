@@ -1,13 +1,12 @@
 import { Router } from "express";
 import GymOwner from '../models/gymOwner.js';
 import auth from '../middleware/auth.js'
-import { MyRequest } from '../interfaces/MyRequest.js'
+import { IRequest } from '../interfaces/IRequest.js'
 import { GymOwnerRepository } from '../repositories/gymOwner.js'
 import { checkExistingEmail, checkExistingEmailForUpdate, validateEmail, validateEmailForUpdate, validatePassword } from "../middleware/validate.js";
 const router = Router()
 const gymOwnerRepository = new GymOwnerRepository()
 
-// Signup
 router.post('/gymOwners/signup', validateEmail, validatePassword, checkExistingEmail, async (req, res) => {
     const { name, email, password } = req.body
     const gymOwner = new GymOwner({ name, email, password })
@@ -20,7 +19,6 @@ router.post('/gymOwners/signup', validateEmail, validatePassword, checkExistingE
     }
 })
 
-// Login
 router.post('/gymOwners/login', validateEmail, validatePassword, async (req, res) => {
     try {
         const gymOwner = await gymOwnerRepository.findByCredentials(req.body.email, req.body.password)
@@ -31,8 +29,7 @@ router.post('/gymOwners/login', validateEmail, validatePassword, async (req, res
     }
 })
 
-// Logout
-router.delete('/gymOwners/logout', auth, async (req: MyRequest, res) => {
+router.delete('/gymOwners/logout', auth, async (req: IRequest, res) => {
     try {
         if (typeof req.gymOwner === 'undefined') {
             return res.status(401).send()
@@ -41,12 +38,11 @@ router.delete('/gymOwners/logout', auth, async (req: MyRequest, res) => {
         await req.gymOwner.save()
         res.send()
     } catch (err: any) {
-        res.status(500).send({ error: err.message })
+        res.status(400).send({ error: err.message })
     }
 })
 
-// Profile
-router.get('/gymOwners/profile', auth, async (req: MyRequest, res) => {
+router.get('/gymOwners/profile', auth, async (req: IRequest, res) => {
     try {
         res.send(req.gymOwner)
     } catch (err: any) {
@@ -54,7 +50,7 @@ router.get('/gymOwners/profile', auth, async (req: MyRequest, res) => {
     }
 })
 
-router.patch('/gymOwners/profile', auth, validateEmailForUpdate, checkExistingEmailForUpdate, async (req: MyRequest, res) => {
+router.patch('/gymOwners/profile', auth, validateEmailForUpdate, checkExistingEmailForUpdate, async (req: IRequest, res) => {
     const { name, email, image }: { name?: string, email?: string, image?: string} = req.body
     try {
         if (!req.gymOwner) {
@@ -77,7 +73,7 @@ router.patch('/gymOwners/profile', auth, validateEmailForUpdate, checkExistingEm
     }
 })
 
-router.delete('/gymOwners/profile', auth, async (req: MyRequest, res) => {
+router.delete('/gymOwners/profile', auth, async (req: IRequest, res) => {
     try {
         if (typeof req.gymOwner === 'undefined') {
             return res.status(401).send()
@@ -85,7 +81,7 @@ router.delete('/gymOwners/profile', auth, async (req: MyRequest, res) => {
         await req.gymOwner.remove()
         res.send()
     } catch (err: any) {
-        res.status(500).send({ error: err.message })
+        res.status(400).send({ error: err.message })
     }
 })
 

@@ -5,7 +5,6 @@ import { GymOwnerRepository } from '../repositories/gymOwner.js';
 import { checkExistingEmail, checkExistingEmailForUpdate, validateEmail, validateEmailForUpdate, validatePassword } from "../middleware/validate.js";
 const router = Router();
 const gymOwnerRepository = new GymOwnerRepository();
-// Signup
 router.post('/gymOwners/signup', validateEmail, validatePassword, checkExistingEmail, async (req, res) => {
     const { name, email, password } = req.body;
     const gymOwner = new GymOwner({ name, email, password });
@@ -18,7 +17,6 @@ router.post('/gymOwners/signup', validateEmail, validatePassword, checkExistingE
         res.status(400).json({ error: err.message });
     }
 });
-// Login
 router.post('/gymOwners/login', validateEmail, validatePassword, async (req, res) => {
     try {
         const gymOwner = await gymOwnerRepository.findByCredentials(req.body.email, req.body.password);
@@ -29,7 +27,6 @@ router.post('/gymOwners/login', validateEmail, validatePassword, async (req, res
         res.status(400).json({ error: err.message });
     }
 });
-// Logout
 router.delete('/gymOwners/logout', auth, async (req, res) => {
     try {
         if (typeof req.gymOwner === 'undefined') {
@@ -40,10 +37,9 @@ router.delete('/gymOwners/logout', auth, async (req, res) => {
         res.send();
     }
     catch (err) {
-        res.status(500).send({ error: err.message });
+        res.status(400).send({ error: err.message });
     }
 });
-// Profile
 router.get('/gymOwners/profile', auth, async (req, res) => {
     try {
         res.send(req.gymOwner);
@@ -84,7 +80,7 @@ router.delete('/gymOwners/profile', auth, async (req, res) => {
         res.send();
     }
     catch (err) {
-        res.status(500).send({ error: err.message });
+        res.status(400).send({ error: err.message });
     }
 });
 export default router;

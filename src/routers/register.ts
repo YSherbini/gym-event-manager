@@ -1,13 +1,12 @@
 import { Router } from "express";
 import Register from "../models/register.js";
 import auth from '../middleware/auth.js'
-import { MyRequest } from "../interfaces/MyRequest.js";
+import { IRequest } from "../interfaces/IRequest.js";
 import { IRegister } from "../interfaces/Register.interface.js";
 import { isValidObjectId } from "../middleware/validate.js";
 const router = Router()
 
-// register
-router.post('/registers', auth, async (req: MyRequest, res) => {
+router.post('/registers', auth, async (req: IRequest, res) => {
     if (typeof req.gymOwner === "undefined") {
         return res.status(400).send()
     }
@@ -28,20 +27,12 @@ router.post('/registers', auth, async (req: MyRequest, res) => {
     }
 })
 
-// Get registers
-router.get('/registers', auth, async (req: MyRequest, res) => {
+router.get('/registers', auth, async (req: IRequest, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available')
         }
         const { name, categoryId } = req.query
-        // const match: any = {gymOwnerId: req.gymOwner._id}
-        // if (typeof name === 'string') {
-        //     match['event'] = {name: {$regex: new RegExp(name, 'i')}}
-        // }
-        // if (typeof categoryId === "string" && categoryId != "") {
-        //     match['event'] = { categoriesIds: { categoryId: categoryId }}
-        // }
         let registers = await Register.find({ gymOwnerId: req.gymOwner._id }).populate('event', "-__v")
         registers = registers.filter((register: IRegister) => {
             const event = register.event
@@ -61,8 +52,7 @@ router.get('/registers', auth, async (req: MyRequest, res) => {
     }
 })
 
-// Get register/registerd teams
-router.get('/registers/:id', auth, isValidObjectId, async (req: MyRequest, res) => {
+router.get('/registers/:id', auth, isValidObjectId, async (req: IRequest, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available')
@@ -77,8 +67,7 @@ router.get('/registers/:id', auth, isValidObjectId, async (req: MyRequest, res) 
     }
 })
 
-// Delete register
-router.delete('/registers/:id', auth, isValidObjectId, async (req: MyRequest, res) => {
+router.delete('/registers/:id', auth, isValidObjectId, async (req: IRequest, res) => {
     try {
         if (typeof req.gymOwner === "undefined") {
             return res.status(400).send('GymOwner not available')
@@ -90,7 +79,7 @@ router.delete('/registers/:id', auth, isValidObjectId, async (req: MyRequest, re
         await register.remove()
         res.send()
     } catch (err: any) {
-        res.status(500).send({ error: err.message })
+        res.status(400).send({ error: err.message })
     }
 })
 
