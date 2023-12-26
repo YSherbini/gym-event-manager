@@ -10,6 +10,7 @@ import Register from "./models/register.js";
 import Category from "./models/category.js";
 import "./db/mongoose.js";
 import gymOwnerRouter from './routers/gymOwner.js';
+import gymOwnerAuthRouter from './routers/gymOwnerAuth.js';
 import teamRouter from './routers/team.js';
 import registerRouter from './routers/register.js';
 import eventRouter from './routers/event.js';
@@ -24,6 +25,7 @@ const start = async () => {
     const app = express();
     app.use(express.json());
     app.use(gymOwnerRouter);
+    app.use(gymOwnerAuthRouter);
     app.use(teamRouter);
     app.use(registerRouter);
     app.use(eventRouter);

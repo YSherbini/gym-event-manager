@@ -6,10 +6,15 @@ import { IRequest } from "../interfaces/IRequest.js";
 import { isValidObjectId } from "../middleware/validate.js";
 const router = Router()
 
+type EventQuery = {
+    name: string;
+    categoryId: string;
+}
+
 // GET /events?category=Football&name=championship
 router.get('/events', auth, async (req, res) => {
     try {
-        const { name, categoryId } = req.query
+        const { name, categoryId } = req.query as EventQuery
         const match: any = {}
         if (typeof name === 'string') {
             match['name'] = {$regex: new RegExp(name, 'i')}
