@@ -1,14 +1,15 @@
 import { Router } from 'express';
-import GymOwner from '../models/gymOwner.js';
 import auth from '../middleware/auth.js';
-import { GymOwnerRepository } from '../repositories/gymOwner.js';
+import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
 import { checkExistingEmail, validateEmail, validatePassword } from '../middleware/validate.js';
+import GymOwner from '../models/gymOwner.js';
 const router = Router();
 const gymOwnerRepository = new GymOwnerRepository();
 router.post('/gymOwners/signup', validateEmail, validatePassword, checkExistingEmail, async (req, res) => {
     const { name, email, password } = req.body;
     const gymOwner = new GymOwner({ name, email, password });
     try {
+        // const gymOwner = gymOwnerRepository.createUser(req.body as IGymOwnerAuthParams)
         await gymOwner.save();
         const token = await gymOwnerRepository.generateAuthToken(gymOwner);
         res.status(201).send({ token });
@@ -19,8 +20,8 @@ router.post('/gymOwners/signup', validateEmail, validatePassword, checkExistingE
 });
 router.post('/gymOwners/login', validateEmail, validatePassword, async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const gymOwner = await gymOwnerRepository.findByCredentials(email, password);
+        const gymOwnerParams = req.body;
+        const gymOwner = await gymOwnerRepository.findByCredentials(gymOwnerParams);
         const token = await gymOwnerRepository.generateAuthToken(gymOwner);
         res.send({ token });
     }

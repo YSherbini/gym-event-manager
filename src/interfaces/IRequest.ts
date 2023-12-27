@@ -1,7 +1,7 @@
 import { Request } from 'express'
-import { IGymOwner } from './GymOwner.interface.js'
+import { IGymOwner } from './IGymOwner.js'
 
 export interface IRequest extends Request {
-    gymOwner?: IGymOwner,
-    token?: string
+    gymOwner: IGymOwner,
+    token: string
 }

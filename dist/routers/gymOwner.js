@@ -1,6 +1,6 @@
 import { Router } from "express";
 import auth from '../middleware/auth.js';
-import { GymOwnerRepository } from '../repositories/gymOwner.js';
+import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
 import { checkExistingEmailForUpdate, validateEmailForUpdate } from "../middleware/validate.js";
 const router = Router();
 const gymOwnerRepository = new GymOwnerRepository();
@@ -15,9 +15,6 @@ router.get('/gymOwners/profile', auth, async (req, res) => {
 router.patch('/gymOwners/profile', auth, validateEmailForUpdate, checkExistingEmailForUpdate, async (req, res) => {
     const updates = req.body;
     try {
-        if (!req.gymOwner) {
-            return res.status(401).send();
-        }
         Object.entries(updates).forEach(([field, fieldValue]) => {
             if (fieldValue !== undefined) {
                 req.gymOwner[field] = fieldValue;
@@ -32,9 +29,6 @@ router.patch('/gymOwners/profile', auth, validateEmailForUpdate, checkExistingEm
 });
 router.delete('/gymOwners/profile', auth, async (req, res) => {
     try {
-        if (typeof req.gymOwner === 'undefined') {
-            return res.status(401).send();
-        }
         await req.gymOwner.remove();
         res.send();
     }

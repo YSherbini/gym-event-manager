@@ -39,9 +39,6 @@ export const validateEmailForUpdate = (req, res, next) => {
 export const checkExistingEmailForUpdate = async (req, res, next) => {
     const { email } = req.body;
     try {
-        if (!req.gymOwner) {
-            return res.status(401).json({ error: 'UnAuthenticated' });
-        }
         const id = req.gymOwner._id;
         const existingUser = await GymOwner.findOne({ email, _id: { $ne: id } });
         if (existingUser) {

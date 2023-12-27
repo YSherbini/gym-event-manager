@@ -5,12 +5,9 @@ import Register from '../models/register.js';
 import { isValidObjectId } from '../middleware/validate.js';
 const router = Router();
 router.post('/teams', auth, async (req, res) => {
-    const { name, categoryId } = req.body;
+    const { name, categoryId, registerId } = req.body;
     try {
-        if (typeof req.gymOwner === 'undefined') {
-            return res.status(400).send();
-        }
-        const register = await Register.findOne({ _id: req.body.registerId, gymOwnerId: req.gymOwner._id }).populate('event teams');
+        const register = await Register.findOne({ _id: registerId, gymOwnerId: req.gymOwner._id }).populate('event teams');
         if (!register) {
             return res.status(404).send('Register not found!');
         }
@@ -36,7 +33,6 @@ router.get('/teams', auth, async (req, res) => {
     const { categoryId, sortBy, limit, skip } = req.query;
     const match = {};
     const sort = {};
-    console.log(categoryId, sortBy, limit, skip);
     if (categoryId) {
         match.categoryId = categoryId;
     }
@@ -44,11 +40,7 @@ router.get('/teams', auth, async (req, res) => {
         const [sortee, order] = sortBy.split(':');
         sort[sortee] = order === 'desc' ? -1 : 1;
     }
-    console.log(sort);
     try {
-        if (typeof req.gymOwner === 'undefined') {
-            return res.status(400).send();
-        }
         await req.gymOwner
             .populate({
             path: 'teams',
@@ -68,9 +60,6 @@ router.get('/teams', auth, async (req, res) => {
 });
 router.get('/teams/:id', auth, isValidObjectId, async (req, res) => {
     try {
-        if (typeof req.gymOwner === 'undefined') {
-            return res.status(400).send('GymOwner not available');
-        }
         const team = await Team.findOne({ _id: req.params.id }).populate('category event', '-__v');
         if (!team) {
             return res.status(404).send('Team not found!');
@@ -84,9 +73,6 @@ router.get('/teams/:id', auth, isValidObjectId, async (req, res) => {
 router.patch('/teams/:id', auth, isValidObjectId, async (req, res) => {
     const updates = req.body;
     try {
-        if (typeof req.gymOwner === 'undefined') {
-            return res.status(400).send('GymOwner not available');
-        }
         const team = await Team.findOne({ _id: req.params.id, gymOwnerId: req.gymOwner._id }).populate('event');
         if (!team) {
             return res.status(404).send();
@@ -108,9 +94,6 @@ router.patch('/teams/:id', auth, isValidObjectId, async (req, res) => {
 });
 router.delete('/teams/:id', auth, isValidObjectId, async (req, res) => {
     try {
-        if (typeof req.gymOwner === 'undefined') {
-            return res.status(400).send('GymOwner not available');
-        }
         const team = await Team.findOneAndDelete({ _id: req.params.id, gymOwnerId: req.gymOwner._id });
         if (!team) {
             res.status(404).send();

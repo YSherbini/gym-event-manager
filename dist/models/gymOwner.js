@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import 'dotenv/config';
+import bcrypt from 'bcrypt';
 import Team from './team.js';
 import Register from './register.js';
 const gymOwnerSchema = new mongoose.Schema({
@@ -44,13 +45,13 @@ gymOwnerSchema.methods.toJSON = function () {
     delete gymOwnerObject.__v;
     return gymOwnerObject;
 };
-// gymOwnerSchema.pre('save', async function (this: IGymOwner, next) {
-//     const gymOwner = this
-//     if (gymOwner.isModified('password')) {
-//         gymOwner.password = await bcrypt.hash(gymOwner.password, 8)
-//     }
-//     next()
-// })
+gymOwnerSchema.pre('save', async function (next) {
+    const gymOwner = this;
+    if (gymOwner.isModified('password')) {
+        gymOwner.password = await bcrypt.hash(gymOwner.password, 8);
+    }
+    next();
+});
 gymOwnerSchema.post('remove', async function (gymOwner, next) {
     await Team.deleteMany({ gymOwnerId: gymOwner._id });
     await Register.deleteMany({ gymOwnerId: gymOwner._id });
