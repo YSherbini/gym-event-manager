@@ -31,8 +31,8 @@ export class RegisterController {
         const registerQuery = req.query as IQuery;
         const gymOwnerId = req.gymOwner._id;
         try {
-            let registers = await this.registerRepository.getAllMatch({ gymOwnerId }, 'event');
-            registers = this.registerRepository.applyQuery(registers, registerQuery);
+            const eventMatch = this.registerRepository.applyQuery(registerQuery)
+            const registers = await this.registerRepository.getAllMatch({ gymOwnerId }, eventMatch)
             res.send(registers);
         } catch (err: any) {
             res.status(400).json({ error: err.message });

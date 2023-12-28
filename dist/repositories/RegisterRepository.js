@@ -6,6 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 import { injectable } from 'inversify';
 import Register from '../models/register.js';
+import { ObjectId } from 'mongodb';
 let RegisterRepository = class RegisterRepository {
     async register(registerParams) {
         const register = new Register(registerParams);
@@ -32,12 +33,41 @@ let RegisterRepository = class RegisterRepository {
             throw new Error('Already regestered!');
         }
     }
-    async getAllMatch(match, populate = '') {
+    async getAllMatch(match, eventMatch, populate = '') {
         try {
-            return await Register.find(match).populate(populate, '-__v');
+            return await Register.aggregate([
+                {
+                    $match: match,
+                },
+                {
+                    $lookup: {
+                        from: 'events',
+                        localField: 'eventId',
+                        foreignField: '_id',
+                        as: 'eventDetails',
+                    },
+                },
+                {
+                    $match: {
+                        eventDetails: {
+                            $elemMatch: eventMatch,
+                        },
+                    },
+                },
+                {
+                    $addFields: {
+                        event: { $arrayElemAt: ['$eventDetails', 0] },
+                    },
+                },
+                {
+                    $project: {
+                        eventDetails: 0,
+                    },
+                },
+            ]);
         }
         catch (err) {
-            throw new Error('Coudnt get all registers');
+            throw new Error('Coudnt get registers!');
         }
     }
     async getOne(options, populate = '') {
@@ -48,15 +78,16 @@ let RegisterRepository = class RegisterRepository {
             throw new Error('Coudnt get register');
         }
     }
-    applyQuery(registers, { name, categoryId }) {
-        return registers.filter((register) => {
-            const event = register.event;
-            if (name || categoryId) {
-                return event && (name && event.name.toLowerCase().includes(name?.toLowerCase()) || categoryId && event.categoriesIds.includes(categoryId));
-            }
-            else
-                return true;
-        });
+    applyQuery(registerQuery) {
+        const eventMatch = {};
+        const { name, categoryId } = registerQuery;
+        if (typeof name === 'string') {
+            eventMatch['name'] = { $regex: new RegExp(name, 'i') };
+        }
+        if (typeof categoryId === 'string' && categoryId != '') {
+            eventMatch['categoriesIds'] = new ObjectId(categoryId);
+        }
+        return eventMatch;
     }
 };
 RegisterRepository = __decorate([

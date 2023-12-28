@@ -1,4 +1,4 @@
-import { IGymOwner, IGymOwnerAuthParams } from '../interfaces/IGymOwner.js';
+import { IGymOwner, IGymOwnerAuthParams, IGymOwnerParams } from '../interfaces/IGymOwner.js';
 import { DataStoredInToken } from '../interfaces/jwt.js';
 import GymOwner from '../models/gymOwner.js';
 import jwt from 'jsonwebtoken';
@@ -23,6 +23,15 @@ export class GymOwnerRepository {
         } catch (err) {
             throw new Error('Coudnt save!');
         }
+    }
+
+    async update(gymOwner: IGymOwner, updates: IGymOwnerParams) {
+        Object.entries(updates).forEach(([field, fieldValue]) => {
+            if (fieldValue !== undefined) {
+                (gymOwner as any)[field] = fieldValue;
+            }
+        });
+        return this.save(gymOwner)
     }
 
     async createUser(gymOwnerParams: IGymOwnerAuthParams) {

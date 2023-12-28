@@ -29,12 +29,7 @@ let GymOwnerController = class GymOwnerController {
         const updates = req.body;
         let { gymOwner } = req;
         try {
-            Object.entries(updates).forEach(([field, fieldValue]) => {
-                if (fieldValue !== undefined) {
-                    gymOwner[field] = fieldValue;
-                }
-            });
-            gymOwner = await this.gymOwnerRepository.save(gymOwner);
+            gymOwner = await this.gymOwnerRepository.update(gymOwner, updates);
             res.send(gymOwner);
         }
         catch (err) {

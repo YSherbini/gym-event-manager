@@ -26,6 +26,14 @@ let GymOwnerRepository = class GymOwnerRepository {
             throw new Error('Coudnt save!');
         }
     }
+    async update(gymOwner, updates) {
+        Object.entries(updates).forEach(([field, fieldValue]) => {
+            if (fieldValue !== undefined) {
+                gymOwner[field] = fieldValue;
+            }
+        });
+        return this.save(gymOwner);
+    }
     async createUser(gymOwnerParams) {
         const gymOwner = new GymOwner(gymOwnerParams);
         return this.save(gymOwner);

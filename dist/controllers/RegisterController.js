@@ -34,8 +34,8 @@ let RegisterController = class RegisterController {
         const registerQuery = req.query;
         const gymOwnerId = req.gymOwner._id;
         try {
-            let registers = await this.registerRepository.getAllMatch({ gymOwnerId }, 'event');
-            registers = this.registerRepository.applyQuery(registers, registerQuery);
+            const eventMatch = this.registerRepository.applyQuery(registerQuery);
+            const registers = await this.registerRepository.getAllMatch({ gymOwnerId }, eventMatch);
             res.send(registers);
         }
         catch (err) {

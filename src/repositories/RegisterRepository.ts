@@ -2,6 +2,7 @@ import { injectable } from 'inversify';
 import Register from '../models/register.js';
 import { IRegister, IRegisterParams } from '../interfaces/IRegister.js';
 import { IQuery } from '../interfaces/IQuery.js';
+import { ObjectId } from 'mongodb'
 
 @injectable()
 export class RegisterRepository {
@@ -32,11 +33,40 @@ export class RegisterRepository {
         }
     }
 
-    async getAllMatch(match: any, populate = '') {
+    async getAllMatch(match: any, eventMatch: any, populate = '') {
         try {
-            return await Register.find(match).populate(populate, '-__v');
+            return await Register.aggregate([
+                {
+                    $match: match,
+                },
+                {
+                    $lookup: {
+                        from: 'events',
+                        localField: 'eventId',
+                        foreignField: '_id',
+                        as: 'eventDetails',
+                    },
+                },
+                {
+                    $match: {
+                        eventDetails: {
+                            $elemMatch: eventMatch,
+                        },
+                    },
+                },
+                {
+                    $addFields: {
+                        event: { $arrayElemAt: ['$eventDetails', 0] },
+                    },
+                },
+                {
+                    $project: {
+                        eventDetails: 0,
+                    },
+                },
+            ]);
         } catch (err) {
-            throw new Error('Coudnt get all registers');
+            throw new Error('Coudnt get registers!')
         }
     }
 
@@ -48,13 +78,15 @@ export class RegisterRepository {
         }
     }
 
-    applyQuery(registers: IRegister[], { name, categoryId }: IQuery) {
-        return registers.filter((register: IRegister) => {
-            const event = register.event;
-            if (name || categoryId) {
-                return event && (name && event.name.toLowerCase().includes(name?.toLowerCase()) || categoryId && event.categoriesIds.includes(categoryId));
-            } else return true;
-        });
+    applyQuery(registerQuery: IQuery) {
+        const eventMatch: any = {};
+        const { name, categoryId } = registerQuery;
+        if (typeof name === 'string') {
+            eventMatch['name'] = { $regex: new RegExp(name, 'i') };
+        }
+        if (typeof categoryId === 'string' && categoryId != '') {
+            eventMatch['categoriesIds'] = new ObjectId(categoryId);
+        }
+        return eventMatch;
     }
-
 }

@@ -30,7 +30,7 @@ let EventRepository = class EventRepository {
             match['name'] = { $regex: new RegExp(name, 'i') };
         }
         if (typeof categoryId === "string" && categoryId != "") {
-            match['categoriesIds'] = { _id: categoryId };
+            match['categoriesIds'] = categoryId;
         }
         return match;
     }
