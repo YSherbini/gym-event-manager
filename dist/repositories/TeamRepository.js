@@ -8,8 +8,7 @@ import { injectable } from 'inversify';
 import Team from '../models/team.js';
 let TeamRepository = class TeamRepository {
     async create(teamParams) {
-        const team = new Team(teamParams);
-        return this.save(team);
+        return new Team(teamParams);
     }
     async update(team, updates) {
         Object.entries(updates).forEach(([field, fieldValue]) => {
@@ -27,6 +26,11 @@ let TeamRepository = class TeamRepository {
             throw new Error('Coudnt save!');
         }
     }
+    async saveAll(teams) {
+        for (const team of teams) {
+            await this.save(team);
+        }
+    }
     async remove(team) {
         try {
             return await team.remove();
@@ -41,6 +45,31 @@ let TeamRepository = class TeamRepository {
         }
         catch (err) {
             throw new Error('Coudnt get team');
+        }
+    }
+    async duplicateTeams(teamsIds, register) {
+        const dupTeams = { teams: [] };
+        try {
+            for (const teamId of teamsIds) {
+                const team = await this.getOne({ _id: teamId });
+                if (!team) {
+                    dupTeams.error = { status: 404, msg: "Team not found!" };
+                    return dupTeams;
+                }
+                if (register.event && !register.event.categoriesIds.includes(team.categoryId)) {
+                    dupTeams.error = { status: 422, msg: "Categories does't match" };
+                    return dupTeams;
+                }
+                const { name, image, categoryId, gymOwnerId, registerId, eventId } = team;
+                const teamParams = { name, image, categoryId, gymOwnerId, registerId, eventId };
+                const dupTeam = await this.create(teamParams);
+                dupTeams.teams.push(dupTeam);
+            }
+            await this.saveAll(dupTeams.teams);
+            return dupTeams;
+        }
+        catch (err) {
+            throw new Error();
         }
     }
     applyQuery({ categoryId, sortBy }) {

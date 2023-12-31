@@ -20,8 +20,18 @@ export interface ITeam extends mongoose.Document {
 export interface ITeamParams {
     name: string;
     image?: string;
-    categoryId: string;
-    gymOwnerId: string;
-    registerId: string;
-    eventId: string;
+    categoryId: ICategory['id'];
+    gymOwnerId: IGymOwner['id'];
+    registerId: IRegister['id'];
+    eventId: IEvent['id'];
+}
+
+export interface IDuplicateParams {
+    teamsIds: ITeam['id'][];
+    registerId: IRegister['id'];
+}
+
+export interface IDuplicateRes {
+    teams: ITeam[];
+    error: { status: number; msg: string };
 }

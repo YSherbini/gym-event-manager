@@ -34,8 +34,32 @@ let TeamController = class TeamController {
             if (register.event && !register.event.categoriesIds.includes(categoryId)) {
                 return res.status(400).send('Categories doesnt match!');
             }
-            const team = await this.teamRepository.create({ name, categoryId, registerId, gymOwnerId, eventId: register.eventId });
+            let team = await this.teamRepository.create({ name, categoryId, registerId, gymOwnerId, eventId: register.eventId });
+            team = await this.teamRepository.save(team);
             res.status(201).send(team);
+        }
+        catch (err) {
+            res.status(400).send({ error: err.message });
+        }
+    }
+    async duplicateTeams(req, res) {
+        const { teamsIds, registerId } = req.body;
+        const gymOwnerId = req.gymOwner._id;
+        try {
+            const register = await this.registerRepository.getOne({ _id: registerId, gymOwnerId }, 'event teams');
+            if (teamsIds.length === 0) {
+                return res.status(400).send("No teams provided.");
+            }
+            if (!register) {
+                return res.status(404).send('Register not found!');
+            }
+            const dupTeams = await this.teamRepository.duplicateTeams(teamsIds, register);
+            if (dupTeams.error) {
+                const { status, msg } = dupTeams.error;
+                return res.status(status).send(msg);
+            }
+            await this.teamRepository.saveAll(dupTeams.teams);
+            res.status(201).send(dupTeams.teams);
         }
         catch (err) {
             res.status(400).send({ error: err.message });
@@ -105,6 +129,9 @@ let TeamController = class TeamController {
 __decorate([
     httpPost('/', auth)
 ], TeamController.prototype, "addTeam", null);
+__decorate([
+    httpPost('/duplicate', auth)
+], TeamController.prototype, "duplicateTeams", null);
 __decorate([
     httpGet('/', auth)
 ], TeamController.prototype, "myTeams", null);

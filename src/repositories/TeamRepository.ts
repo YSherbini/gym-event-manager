@@ -1,13 +1,13 @@
 import { injectable } from 'inversify';
 import Team from '../models/team.js';
-import { ITeam, ITeamParams } from '../interfaces/ITeam.js';
+import { IDuplicateRes, ITeam, ITeamParams } from '../interfaces/ITeam.js';
 import { IQuery } from '../interfaces/IQuery.js';
+import { IRegister } from 'interfaces/IRegister.js';
 
 @injectable()
 export class TeamRepository {
     async create(teamParams: ITeamParams) {
-        const team = new Team(teamParams);
-        return this.save(team);
+        return new Team(teamParams);
     }
 
     async update(team: ITeam, updates: ITeamParams) {
@@ -27,6 +27,12 @@ export class TeamRepository {
         }
     }
 
+    async saveAll(teams: ITeam[]) {
+        for (const team of teams) {
+            await this.save(team)
+        }
+    }
+
     async remove(team: ITeam) {
         try {
             return await team.remove();
@@ -41,6 +47,32 @@ export class TeamRepository {
         } catch (err) {
             throw new Error('Coudnt get team');
         }
+    }
+
+    async duplicateTeams(teamsIds: ITeam[], register: IRegister) {
+        const dupTeams = {teams: [] as ITeam[]} as IDuplicateRes
+        try {
+            for (const teamId of teamsIds) {
+                const team = await this.getOne({ _id: teamId })
+                if (!team) {
+                    dupTeams.error = {status: 404, msg: "Team not found!"}
+                    return dupTeams
+                }
+                if (register.event && !register.event.categoriesIds.includes(team.categoryId)) {
+                    dupTeams.error = {status: 422, msg: "Categories does't match"}
+                    return dupTeams
+                }
+                const { name, image, categoryId, gymOwnerId, registerId, eventId } = team
+                const teamParams: ITeamParams = { name, image, categoryId, gymOwnerId, registerId, eventId }
+                const dupTeam = await this.create(teamParams)
+                dupTeams.teams.push(dupTeam)
+            }
+            await this.saveAll(dupTeams.teams)
+            return dupTeams
+        } catch (err) {
+            throw new Error()
+        }
+        
     }
 
     applyQuery({ categoryId, sortBy }: IQuery) {

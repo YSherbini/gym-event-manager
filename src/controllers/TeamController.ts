@@ -5,7 +5,7 @@ import { IRequest } from '../interfaces/IRequest.js';
 import auth from '../middleware/auth.js';
 import { isValidObjectId } from '../middleware/validate.js';
 import { TeamRepository } from '../repositories/TeamRepository.js';
-import { ITeamParams } from '../interfaces/ITeam.js';
+import { ITeam, IDuplicateParams, ITeamParams } from '../interfaces/ITeam.js';
 import { IQuery } from '../interfaces/IQuery.js';
 import { RegisterRepository } from '../repositories/RegisterRepository.js';
 import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
@@ -30,8 +30,33 @@ export class TeamController {
             if (register.event && !register.event.categoriesIds.includes(categoryId)) {
                 return res.status(400).send('Categories doesnt match!');
             }
-            const team = await this.teamRepository.create({ name, categoryId, registerId, gymOwnerId, eventId: register.eventId });
+            let team = await this.teamRepository.create({ name, categoryId, registerId, gymOwnerId, eventId: register.eventId });
+            team = await this.teamRepository.save(team)
             res.status(201).send(team);
+        } catch (err: any) {
+            res.status(400).send({ error: err.message });
+        }
+    }
+
+    @httpPost('/duplicate', auth)
+    async duplicateTeams(req: IRequest, res: express.Response) {
+        const { teamsIds, registerId } = req.body as IDuplicateParams;
+        const gymOwnerId = req.gymOwner._id;
+        try {
+            const register = await this.registerRepository.getOne({ _id: registerId, gymOwnerId }, 'event teams');
+            if (teamsIds.length === 0) {
+                return res.status(400).send("No teams provided.")
+            }
+            if (!register) {
+                return res.status(404).send('Register not found!');
+            }
+            const dupTeams = await this.teamRepository.duplicateTeams(teamsIds, register)
+            if (dupTeams.error) {
+                const { status, msg } = dupTeams.error
+                return res.status(status).send(msg)
+            }
+            await this.teamRepository.saveAll(dupTeams.teams)
+            res.status(201).send(dupTeams.teams);
         } catch (err: any) {
             res.status(400).send({ error: err.message });
         }
