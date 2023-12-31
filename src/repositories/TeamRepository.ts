@@ -29,7 +29,7 @@ export class TeamRepository {
 
     async saveAll(teams: ITeam[]) {
         for (const team of teams) {
-            await this.save(team)
+            await this.save(team);
         }
     }
 
@@ -50,36 +50,38 @@ export class TeamRepository {
     }
 
     async duplicateTeams(teamsIds: ITeam[], register: IRegister) {
-        const dupTeams = {teams: [] as ITeam[]} as IDuplicateRes
+        const dupTeams = { teams: [] as ITeam[] } as IDuplicateRes;
         try {
             for (const teamId of teamsIds) {
-                const team = await this.getOne({ _id: teamId })
+                const team = await this.getOne({ _id: teamId });
                 if (!team) {
-                    dupTeams.error = {status: 404, msg: "Team not found!"}
-                    return dupTeams
+                    dupTeams.error = { status: 404, msg: 'Team not found!' };
+                    return dupTeams;
                 }
                 if (register.event && !register.event.categoriesIds.includes(team.categoryId)) {
-                    dupTeams.error = {status: 422, msg: "Categories does't match"}
-                    return dupTeams
+                    dupTeams.error = { status: 422, msg: "Categories does't match" };
+                    return dupTeams;
                 }
-                const { name, image, categoryId, gymOwnerId, registerId, eventId } = team
-                const teamParams: ITeamParams = { name, image, categoryId, gymOwnerId, registerId, eventId }
-                const dupTeam = await this.create(teamParams)
-                dupTeams.teams.push(dupTeam)
+                const { name, image, categoryId, gymOwnerId, registerId, eventId } = team;
+                const teamParams: ITeamParams = { name, image, categoryId, gymOwnerId, registerId, eventId };
+                const dupTeam = await this.create(teamParams);
+                dupTeams.teams.push(dupTeam);
             }
-            await this.saveAll(dupTeams.teams)
-            return dupTeams
+            await this.saveAll(dupTeams.teams);
+            return dupTeams;
         } catch (err) {
-            throw new Error()
+            throw new Error();
         }
-        
     }
 
-    applyQuery({ categoryId, sortBy }: IQuery) {
-        const match: { categoryId?: string } = {};
+    applyQuery({ categoryId, sortBy }: IQuery, categoriesIds: string[]) {
+        let match = { $and: [] as any[] };
         const sort: Record<string, number> = {};
         if (categoryId) {
-            match.categoryId = categoryId;
+            match.$and.push({ categoryId });
+        }
+        if (categoriesIds.length > 0) {
+            match.$and.push({ categoryId: { $in: categoriesIds } });
         }
         if (sortBy) {
             const [sortee, order] = sortBy.split(':');

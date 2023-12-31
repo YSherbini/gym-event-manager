@@ -9,12 +9,14 @@ import { ITeam, IDuplicateParams, ITeamParams } from '../interfaces/ITeam.js';
 import { IQuery } from '../interfaces/IQuery.js';
 import { RegisterRepository } from '../repositories/RegisterRepository.js';
 import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
+import { EventRepository } from '../repositories/EventRepository.js';
 
 @controller('/teams')
 export class TeamController {
     constructor(
         @inject(TeamRepository) private readonly teamRepository: TeamRepository,
         @inject(RegisterRepository) private readonly registerRepository: RegisterRepository,
+        @inject(EventRepository) private readonly  eventRepository: EventRepository,
         @inject(GymOwnerRepository) private readonly  gymOwnerRepository: GymOwnerRepository
         ) {}
 
@@ -66,7 +68,15 @@ export class TeamController {
     async myTeams(req: IRequest, res: express.Response) {
         const teamQuery = req.query as IQuery;
         const { gymOwner } = req;
-        const { match, sort } = this.teamRepository.applyQuery(teamQuery);
+        let categoriesIds: string[] = []
+        if (teamQuery.eventId) {
+            const event = await this.eventRepository.getById(teamQuery.eventId)
+            if (event) {
+                categoriesIds = event.categoriesIds
+            }
+            
+        }
+        const { match, sort } = this.teamRepository.applyQuery(teamQuery, categoriesIds);
         const { skip, limit } = teamQuery
         try {
             await this.gymOwnerRepository.getTeams(gymOwner, match, sort, skip, limit, 'teams')

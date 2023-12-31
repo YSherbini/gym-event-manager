@@ -53,7 +53,7 @@ let TeamRepository = class TeamRepository {
             for (const teamId of teamsIds) {
                 const team = await this.getOne({ _id: teamId });
                 if (!team) {
-                    dupTeams.error = { status: 404, msg: "Team not found!" };
+                    dupTeams.error = { status: 404, msg: 'Team not found!' };
                     return dupTeams;
                 }
                 if (register.event && !register.event.categoriesIds.includes(team.categoryId)) {
@@ -72,11 +72,14 @@ let TeamRepository = class TeamRepository {
             throw new Error();
         }
     }
-    applyQuery({ categoryId, sortBy }) {
-        const match = {};
+    applyQuery({ categoryId, sortBy }, categoriesIds) {
+        let match = { $and: [] };
         const sort = {};
         if (categoryId) {
-            match.categoryId = categoryId;
+            match.$and.push({ categoryId });
+        }
+        if (categoriesIds.length > 0) {
+            match.$and.push({ categoryId: { $in: categoriesIds } });
         }
         if (sortBy) {
             const [sortee, order] = sortBy.split(':');

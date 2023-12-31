@@ -14,13 +14,16 @@ import { isValidObjectId } from '../middleware/validate.js';
 import { TeamRepository } from '../repositories/TeamRepository.js';
 import { RegisterRepository } from '../repositories/RegisterRepository.js';
 import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
+import { EventRepository } from '../repositories/EventRepository.js';
 let TeamController = class TeamController {
     teamRepository;
     registerRepository;
+    eventRepository;
     gymOwnerRepository;
-    constructor(teamRepository, registerRepository, gymOwnerRepository) {
+    constructor(teamRepository, registerRepository, eventRepository, gymOwnerRepository) {
         this.teamRepository = teamRepository;
         this.registerRepository = registerRepository;
+        this.eventRepository = eventRepository;
         this.gymOwnerRepository = gymOwnerRepository;
     }
     async addTeam(req, res) {
@@ -68,7 +71,14 @@ let TeamController = class TeamController {
     async myTeams(req, res) {
         const teamQuery = req.query;
         const { gymOwner } = req;
-        const { match, sort } = this.teamRepository.applyQuery(teamQuery);
+        let categoriesIds = [];
+        if (teamQuery.eventId) {
+            const event = await this.eventRepository.getById(teamQuery.eventId);
+            if (event) {
+                categoriesIds = event.categoriesIds;
+            }
+        }
+        const { match, sort } = this.teamRepository.applyQuery(teamQuery, categoriesIds);
         const { skip, limit } = teamQuery;
         try {
             await this.gymOwnerRepository.getTeams(gymOwner, match, sort, skip, limit, 'teams');
@@ -148,7 +158,8 @@ TeamController = __decorate([
     controller('/teams'),
     __param(0, inject(TeamRepository)),
     __param(1, inject(RegisterRepository)),
-    __param(2, inject(GymOwnerRepository))
+    __param(2, inject(EventRepository)),
+    __param(3, inject(GymOwnerRepository))
 ], TeamController);
 export { TeamController };
 //# sourceMappingURL=TeamController.js.map
