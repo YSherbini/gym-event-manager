@@ -2,7 +2,7 @@
   "name": "gym-event-manager",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
+  "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon ./dist/index.js",
