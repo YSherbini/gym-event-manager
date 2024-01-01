@@ -1,20 +1,17 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.container = void 0;
-const mongoose_js_1 = require("../db/mongoose.js");
-const inversify_1 = require("inversify");
-const CategoryRepository_js_1 = require("../repositories/CategoryRepository.js");
-const GymOwnerRepository_js_1 = require("../repositories/GymOwnerRepository.js");
-const EventRepository_js_1 = require("../repositories/EventRepository.js");
-const RegisterRepository_js_1 = require("../repositories/RegisterRepository.js");
-const TeamRepository_js_1 = require("../repositories/TeamRepository.js");
-exports.container = new inversify_1.Container({
+import { DBService } from "../db/mongoose.js";
+import { Container } from "inversify";
+import { CategoryRepository } from "../repositories/CategoryRepository.js";
+import { GymOwnerRepository } from "../repositories/GymOwnerRepository.js";
+import { EventRepository } from "../repositories/EventRepository.js";
+import { RegisterRepository } from "../repositories/RegisterRepository.js";
+import { TeamRepository } from "../repositories/TeamRepository.js";
+export const container = new Container({
     defaultScope: 'Singleton'
 });
-exports.container.bind(mongoose_js_1.DBService).toSelf();
-exports.container.bind(GymOwnerRepository_js_1.GymOwnerRepository).toSelf();
-exports.container.bind(CategoryRepository_js_1.CategoryRepository).toSelf();
-exports.container.bind(EventRepository_js_1.EventRepository).toSelf();
-exports.container.bind(RegisterRepository_js_1.RegisterRepository).toSelf();
-exports.container.bind(TeamRepository_js_1.TeamRepository).toSelf();
+container.bind(DBService).toSelf();
+container.bind(GymOwnerRepository).toSelf();
+container.bind(CategoryRepository).toSelf();
+container.bind(EventRepository).toSelf();
+container.bind(RegisterRepository).toSelf();
+container.bind(TeamRepository).toSelf();
 //# sourceMappingURL=index.js.map

@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,181 +7,159 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TeamController = void 0;
-const inversify_express_utils_1 = require("inversify-express-utils");
-const inversify_1 = require("inversify");
-const auth_js_1 = __importDefault(require("../middleware/auth.js"));
-const validate_js_1 = require("../middleware/validate.js");
-const TeamRepository_js_1 = require("../repositories/TeamRepository.js");
-const RegisterRepository_js_1 = require("../repositories/RegisterRepository.js");
-const GymOwnerRepository_js_1 = require("../repositories/GymOwnerRepository.js");
-const EventRepository_js_1 = require("../repositories/EventRepository.js");
+import { controller, httpDelete, httpGet, httpPatch, httpPost } from 'inversify-express-utils';
+import { inject } from 'inversify';
+import auth from '../middleware/auth.js';
+import { isValidObjectId } from '../middleware/validate.js';
+import { TeamRepository } from '../repositories/TeamRepository.js';
+import { RegisterRepository } from '../repositories/RegisterRepository.js';
+import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
+import { EventRepository } from '../repositories/EventRepository.js';
 let TeamController = class TeamController {
+    teamRepository;
+    registerRepository;
+    eventRepository;
+    gymOwnerRepository;
     constructor(teamRepository, registerRepository, eventRepository, gymOwnerRepository) {
         this.teamRepository = teamRepository;
         this.registerRepository = registerRepository;
         this.eventRepository = eventRepository;
         this.gymOwnerRepository = gymOwnerRepository;
     }
-    addTeam(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { name, categoryId, registerId } = req.body;
-            const gymOwnerId = req.gymOwner._id;
-            try {
-                const register = yield this.registerRepository.getOne({ _id: registerId, gymOwnerId }, 'event teams');
-                if (!register) {
-                    return res.status(404).send('Register not found!');
-                }
-                if (register.event && !register.event.categoriesIds.includes(categoryId)) {
-                    return res.status(400).send('Categories doesnt match!');
-                }
-                let team = yield this.teamRepository.create({ name, categoryId, registerId, gymOwnerId, eventId: register.eventId });
-                team = yield this.teamRepository.save(team);
-                res.status(201).send(team);
+    async addTeam(req, res) {
+        const { name, categoryId, registerId } = req.body;
+        const gymOwnerId = req.gymOwner._id;
+        try {
+            const register = await this.registerRepository.getOne({ _id: registerId, gymOwnerId }, 'event teams');
+            if (!register) {
+                return res.status(404).send('Register not found!');
             }
-            catch (err) {
-                res.status(400).send({ error: err.message });
+            if (register.event && !register.event.categoriesIds.includes(categoryId)) {
+                return res.status(400).send('Categories doesnt match!');
             }
-        });
+            let team = await this.teamRepository.create({ name, categoryId, registerId, gymOwnerId, eventId: register.eventId });
+            team = await this.teamRepository.save(team);
+            res.status(201).send(team);
+        }
+        catch (err) {
+            res.status(400).send({ error: err.message });
+        }
     }
-    duplicateTeams(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { teamsIds, registerId } = req.body;
-            const gymOwnerId = req.gymOwner._id;
-            try {
-                const register = yield this.registerRepository.getOne({ _id: registerId, gymOwnerId }, 'event teams');
-                if (teamsIds.length === 0) {
-                    return res.status(400).send("No teams provided.");
-                }
-                if (!register) {
-                    return res.status(404).send('Register not found!');
-                }
-                const { teams, error } = yield this.teamRepository.duplicateTeams(teamsIds, register);
-                if (error) {
-                    const { status, msg } = error;
-                    return res.status(status).send(msg);
-                }
-                yield this.teamRepository.saveAll(teams);
-                res.status(201).send(teams);
+    async duplicateTeams(req, res) {
+        const { teamsIds, registerId } = req.body;
+        const gymOwnerId = req.gymOwner._id;
+        try {
+            const register = await this.registerRepository.getOne({ _id: registerId, gymOwnerId }, 'event teams');
+            if (teamsIds.length === 0) {
+                return res.status(400).send("No teams provided.");
             }
-            catch (err) {
-                res.status(400).send({ error: err.message });
+            if (!register) {
+                return res.status(404).send('Register not found!');
             }
-        });
+            const { teams, error } = await this.teamRepository.duplicateTeams(teamsIds, register);
+            if (error) {
+                const { status, msg } = error;
+                return res.status(status).send(msg);
+            }
+            await this.teamRepository.saveAll(teams);
+            res.status(201).send(teams);
+        }
+        catch (err) {
+            res.status(400).send({ error: err.message });
+        }
     }
-    myTeams(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const teamQuery = req.query;
-            const { gymOwner } = req;
-            let categoriesIds = [];
-            if (teamQuery.eventId) {
-                const event = yield this.eventRepository.getById(teamQuery.eventId);
-                if (event) {
-                    categoriesIds = event.categoriesIds;
-                }
+    async myTeams(req, res) {
+        const teamQuery = req.query;
+        const { gymOwner } = req;
+        let categoriesIds = [];
+        if (teamQuery.eventId) {
+            const event = await this.eventRepository.getById(teamQuery.eventId);
+            if (event) {
+                categoriesIds = event.categoriesIds;
             }
-            const { match, sort } = this.teamRepository.applyQuery(teamQuery, categoriesIds);
-            const { skip, limit } = teamQuery;
-            try {
-                yield this.gymOwnerRepository.getTeams(gymOwner, match, sort, skip, limit, 'teams');
-                res.send(gymOwner.teams);
-            }
-            catch (err) {
-                res.status(400).json({ error: err.message });
-            }
-        });
+        }
+        const { match, sort } = this.teamRepository.applyQuery(teamQuery, categoriesIds);
+        const { skip, limit } = teamQuery;
+        try {
+            await this.gymOwnerRepository.getTeams(gymOwner, match, sort, skip, limit, 'teams');
+            res.send(gymOwner.teams);
+        }
+        catch (err) {
+            res.status(400).json({ error: err.message });
+        }
     }
-    team(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            try {
-                const team = yield this.teamRepository.getOne({ _id: id }, 'category event');
-                if (!team) {
-                    return res.status(404).send('Team not found!');
-                }
-                res.send(team);
+    async team(req, res) {
+        const { id } = req.params;
+        try {
+            const team = await this.teamRepository.getOne({ _id: id }, 'category event');
+            if (!team) {
+                return res.status(404).send('Team not found!');
             }
-            catch (err) {
-                res.status(400).json({ error: err.message });
-            }
-        });
+            res.send(team);
+        }
+        catch (err) {
+            res.status(400).json({ error: err.message });
+        }
     }
-    editTeam(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const updates = req.body;
-            const gymOwnerId = req.gymOwner._id;
-            try {
-                let team = yield this.teamRepository.getOne({ _id: id, gymOwnerId }, 'event');
-                if (!team) {
-                    return res.status(404).send('Team not found!');
-                }
-                if (updates.categoryId && team.event && !team.event.categoriesIds.includes(updates.categoryId)) {
-                    return res.status(400).send('Categories doesnt match!');
-                }
-                team = yield this.teamRepository.update(team, updates);
-                res.send(team);
+    async editTeam(req, res) {
+        const { id } = req.params;
+        const updates = req.body;
+        const gymOwnerId = req.gymOwner._id;
+        try {
+            let team = await this.teamRepository.getOne({ _id: id, gymOwnerId }, 'event');
+            if (!team) {
+                return res.status(404).send('Team not found!');
             }
-            catch (err) {
-                res.status(400).json({ error: err.message });
+            if (updates.categoryId && team.event && !team.event.categoriesIds.includes(updates.categoryId)) {
+                return res.status(400).send('Categories doesnt match!');
             }
-        });
+            team = await this.teamRepository.update(team, updates);
+            res.send(team);
+        }
+        catch (err) {
+            res.status(400).json({ error: err.message });
+        }
     }
-    deleteTeam(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const gymOwnerId = req.gymOwner._id;
-            try {
-                const team = yield this.teamRepository.getOne({ _id: id, gymOwnerId });
-                if (!team) {
-                    return res.status(404).send('Team not found!');
-                }
-                yield this.teamRepository.remove(team);
-                res.send();
+    async deleteTeam(req, res) {
+        const { id } = req.params;
+        const gymOwnerId = req.gymOwner._id;
+        try {
+            const team = await this.teamRepository.getOne({ _id: id, gymOwnerId });
+            if (!team) {
+                return res.status(404).send('Team not found!');
             }
-            catch (err) {
-                res.status(400).json({ error: err.message });
-            }
-        });
+            await this.teamRepository.remove(team);
+            res.send();
+        }
+        catch (err) {
+            res.status(400).json({ error: err.message });
+        }
     }
 };
-exports.TeamController = TeamController;
 __decorate([
-    (0, inversify_express_utils_1.httpPost)('/', auth_js_1.default)
+    httpPost('/', auth)
 ], TeamController.prototype, "addTeam", null);
 __decorate([
-    (0, inversify_express_utils_1.httpPost)('/duplicate', auth_js_1.default)
+    httpPost('/duplicate', auth)
 ], TeamController.prototype, "duplicateTeams", null);
 __decorate([
-    (0, inversify_express_utils_1.httpGet)('/', auth_js_1.default)
+    httpGet('/', auth)
 ], TeamController.prototype, "myTeams", null);
 __decorate([
-    (0, inversify_express_utils_1.httpGet)('/:id', auth_js_1.default, validate_js_1.isValidObjectId)
+    httpGet('/:id', auth, isValidObjectId)
 ], TeamController.prototype, "team", null);
 __decorate([
-    (0, inversify_express_utils_1.httpPatch)('/:id', auth_js_1.default, validate_js_1.isValidObjectId)
+    httpPatch('/:id', auth, isValidObjectId)
 ], TeamController.prototype, "editTeam", null);
 __decorate([
-    (0, inversify_express_utils_1.httpDelete)('/:id', auth_js_1.default, validate_js_1.isValidObjectId)
+    httpDelete('/:id', auth, isValidObjectId)
 ], TeamController.prototype, "deleteTeam", null);
-exports.TeamController = TeamController = __decorate([
-    (0, inversify_express_utils_1.controller)('/teams'),
-    __param(0, (0, inversify_1.inject)(TeamRepository_js_1.TeamRepository)),
-    __param(1, (0, inversify_1.inject)(RegisterRepository_js_1.RegisterRepository)),
-    __param(2, (0, inversify_1.inject)(EventRepository_js_1.EventRepository)),
-    __param(3, (0, inversify_1.inject)(GymOwnerRepository_js_1.GymOwnerRepository))
+TeamController = __decorate([
+    controller('/teams'),
+    __param(0, inject(TeamRepository)),
+    __param(1, inject(RegisterRepository)),
+    __param(2, inject(EventRepository)),
+    __param(3, inject(GymOwnerRepository))
 ], TeamController);
+export { TeamController };
 //# sourceMappingURL=TeamController.js.map
