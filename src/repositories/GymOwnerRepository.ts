@@ -34,6 +34,11 @@ export class GymOwnerRepository {
         return this.save(gymOwner)
     }
 
+    async changePassword(gymOwner: IGymOwner, password: string) {
+        gymOwner.password = password;
+        return this.save(gymOwner)
+    }
+
     async createUser(gymOwnerParams: IGymOwnerAuthParams) {
         const gymOwner = new GymOwner(gymOwnerParams);
         return this.save(gymOwner);

@@ -11,7 +11,7 @@ import { controller, httpPatch, httpDelete, httpGet } from 'inversify-express-ut
 import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
 import { inject } from 'inversify';
 import auth from '../middleware/auth.js';
-import { validateEmailForUpdate, checkExistingEmailForUpdate } from '../middleware/validate.js';
+import { validateEmailForUpdate, checkExistingEmailForUpdate, validatePassword } from '../middleware/validate.js';
 let GymOwnerController = class GymOwnerController {
     gymOwnerRepository;
     constructor(gymOwnerRepository) {
@@ -36,6 +36,17 @@ let GymOwnerController = class GymOwnerController {
             res.status(400).json({ error: err.message });
         }
     }
+    async changePassword(req, res) {
+        const { password } = req.body;
+        let { gymOwner } = req;
+        try {
+            gymOwner = await this.gymOwnerRepository.changePassword(gymOwner, password);
+            res.send();
+        }
+        catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    }
     async deleteProfile(req, res) {
         let { gymOwner } = req;
         try {
@@ -48,16 +59,19 @@ let GymOwnerController = class GymOwnerController {
     }
 };
 __decorate([
-    httpGet('/profile', auth)
+    httpGet('/', auth)
 ], GymOwnerController.prototype, "profile", null);
 __decorate([
-    httpPatch('/profile', auth, validateEmailForUpdate, checkExistingEmailForUpdate)
+    httpPatch('/', auth, validateEmailForUpdate, checkExistingEmailForUpdate)
 ], GymOwnerController.prototype, "EditProfile", null);
 __decorate([
-    httpDelete('/profile', auth)
+    httpPatch('/changePassword', auth, validatePassword)
+], GymOwnerController.prototype, "changePassword", null);
+__decorate([
+    httpDelete('/', auth)
 ], GymOwnerController.prototype, "deleteProfile", null);
 GymOwnerController = __decorate([
-    controller('/gymOwners'),
+    controller('/gymOwners/profile'),
     __param(0, inject(GymOwnerRepository))
 ], GymOwnerController);
 export { GymOwnerController };

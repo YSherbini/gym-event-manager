@@ -5,13 +5,13 @@ import { IGymOwnerParams } from '../interfaces/IGymOwner.js';
 import { inject } from 'inversify';
 import { IRequest } from '../interfaces/IRequest.js';
 import auth from '../middleware/auth.js';
-import { validateEmailForUpdate, checkExistingEmailForUpdate } from '../middleware/validate.js';
+import { validateEmailForUpdate, checkExistingEmailForUpdate, validatePassword } from '../middleware/validate.js';
 
-@controller('/gymOwners')
+@controller('/gymOwners/profile')
 export class GymOwnerController {
     constructor(@inject(GymOwnerRepository) private readonly gymOwnerRepository: GymOwnerRepository) {}
 
-    @httpGet('/profile', auth)
+    @httpGet('/', auth)
     async profile(req: IRequest, res: express.Response) {
         try {
             res.send(req.gymOwner);
@@ -20,7 +20,7 @@ export class GymOwnerController {
         }
     }
 
-    @httpPatch('/profile', auth, validateEmailForUpdate, checkExistingEmailForUpdate)
+    @httpPatch('/', auth, validateEmailForUpdate, checkExistingEmailForUpdate)
     async EditProfile(req: IRequest, res: express.Response) {
         const updates = req.body as IGymOwnerParams;
         let { gymOwner } = req
@@ -32,7 +32,19 @@ export class GymOwnerController {
         }
     }
 
-    @httpDelete('/profile', auth)
+    @httpPatch('/changePassword', auth, validatePassword)
+    async changePassword(req: IRequest, res: express.Response) {
+        const { password } = req.body;
+        let { gymOwner } = req
+        try {
+            gymOwner = await this.gymOwnerRepository.changePassword(gymOwner, password);
+            res.send()
+        } catch (err: any) {
+            res.status(400).json({ error: err.message });
+        }
+    }
+
+    @httpDelete('/', auth)
     async deleteProfile(req: IRequest, res: express.Response) {
         let { gymOwner } = req;
         try {

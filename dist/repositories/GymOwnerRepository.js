@@ -34,6 +34,10 @@ let GymOwnerRepository = class GymOwnerRepository {
         });
         return this.save(gymOwner);
     }
+    async changePassword(gymOwner, password) {
+        gymOwner.password = password;
+        return this.save(gymOwner);
+    }
     async createUser(gymOwnerParams) {
         const gymOwner = new GymOwner(gymOwnerParams);
         return this.save(gymOwner);

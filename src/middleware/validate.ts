@@ -37,7 +37,7 @@ export const checkExistingEmail = async (req: express.Request, res: express.Resp
 export const validateEmailForUpdate = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email } = req.body;
     const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (email && !emailRegex.test(email)) {
+    if (email == "" || email && !emailRegex.test(email)) {
         return res.status(422).json({ error: 'Invalid email format' });
     }
     next(); 
