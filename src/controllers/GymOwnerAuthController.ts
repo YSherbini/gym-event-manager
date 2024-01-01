@@ -31,7 +31,7 @@ export class GymOwnerAuthController {
         const token = await this.gymOwnerRepository.generateAuthToken(gymOwner);
         res.send({ token });
     } catch (err: any) {
-        res.status(400).json({ error: err.message });
+        res.status(401).json({ error: err.message });
     }
     }
 

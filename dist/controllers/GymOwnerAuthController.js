@@ -36,7 +36,7 @@ let GymOwnerAuthController = class GymOwnerAuthController {
             res.send({ token });
         }
         catch (err) {
-            res.status(400).json({ error: err.message });
+            res.status(401).json({ error: err.message });
         }
     }
     async logout(req, res) {

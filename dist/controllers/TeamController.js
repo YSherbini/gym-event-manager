@@ -56,13 +56,13 @@ let TeamController = class TeamController {
             if (!register) {
                 return res.status(404).send('Register not found!');
             }
-            const dupTeams = await this.teamRepository.duplicateTeams(teamsIds, register);
-            if (dupTeams.error) {
-                const { status, msg } = dupTeams.error;
+            const { teams, error } = await this.teamRepository.duplicateTeams(teamsIds, register);
+            if (error) {
+                const { status, msg } = error;
                 return res.status(status).send(msg);
             }
-            await this.teamRepository.saveAll(dupTeams.teams);
-            res.status(201).send(dupTeams.teams);
+            await this.teamRepository.saveAll(teams);
+            res.status(201).send(teams);
         }
         catch (err) {
             res.status(400).send({ error: err.message });
