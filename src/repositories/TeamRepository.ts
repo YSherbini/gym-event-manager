@@ -3,6 +3,7 @@ import Team from '../models/team.js';
 import { IDuplicateRes, ITeam, ITeamParams } from '../interfaces/ITeam.js';
 import { ITeamQuery } from '../interfaces/ITeam.js';
 import { IRegister } from 'interfaces/IRegister.js';
+import { IEvent } from 'interfaces/IEvent.js';
 
 enum SortOrder {
     asc = 1,
@@ -49,7 +50,7 @@ export class TeamRepository {
         return await Team.findOne(options).populate(populate, '-__v');
     }
 
-    async duplicateTeams(teamsIds: ITeam[], register: IRegister) {
+    async duplicateTeams(teamsIds: ITeam[], event: IEvent, register: IRegister) {
         const dupTeams = { teams: [] as ITeam[] } as IDuplicateRes;
 
         for (const teamId of teamsIds) {
@@ -61,7 +62,7 @@ export class TeamRepository {
                 return dupTeams;
             }
 
-            if (register.event && !register.event.categoriesIds.includes(team.categoryId)) {
+            if (!event.categoriesIds.includes(team.categoryId)) {
                 dupTeams.error = { status: 422, msg: "Categories does't match" };
 
                 return dupTeams;

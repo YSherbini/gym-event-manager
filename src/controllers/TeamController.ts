@@ -21,21 +21,30 @@ export class TeamController {
 
     @httpPost('/')
     async addTeam(req: IRequest, res: express.Response) {
-        const { name, categoryId, registerId } = req.body as ITeamParams;
+        const { name, categoryId, registerId, eventId } = req.body as ITeamParams;
         const gymOwnerId = req.gymOwner._id;
 
         try {
-            const register = await this.registerRepository.getOne({ _id: registerId, gymOwnerId }, 'event teams');
+            const register = await this.registerRepository.getOne({ _id: registerId, gymOwnerId }, 'teams');
+            const event = await this.eventRepository.getById(eventId)
 
             if (!register) {
                 return res.status(404).send('Register not found!');
             }
 
-            if (register.event && !register.event.categoriesIds.includes(categoryId)) {
+            if (!event) {
+                return res.status(404).send('Event not found!');
+            }
+            
+            if (String(register.eventId) !== String(event._id)) {
+                return res.status(400).send('No such register in event')
+            }
+
+            if (!event.categoriesIds.includes(categoryId)) {
                 return res.status(400).send('Categories doesnt match!');
             }
 
-            let team = this.teamRepository.create({ name, categoryId, registerId, gymOwnerId, eventId: register.eventId });
+            let team = this.teamRepository.create({ name, categoryId, registerId, gymOwnerId, eventId });
             team = await this.teamRepository.save(team);
 
             res.status(201).send(team);
@@ -46,11 +55,12 @@ export class TeamController {
 
     @httpPost('/duplicate')
     async duplicateTeams(req: IRequest, res: express.Response) {
-        const { teamsIds, registerId } = req.body as IDuplicateParams;
+        const { teamsIds, registerId, eventId } = req.body as IDuplicateParams;
         const gymOwnerId = req.gymOwner._id;
 
         try {
             const register = await this.registerRepository.getOne({ _id: registerId, gymOwnerId }, 'event teams');
+            const event = await this.eventRepository.getById(eventId)
 
             if (teamsIds.length === 0) {
                 return res.status(400).send('No teams provided.');
@@ -60,7 +70,15 @@ export class TeamController {
                 return res.status(404).send('Register not found!');
             }
 
-            const { teams, error } = await this.teamRepository.duplicateTeams(teamsIds, register);
+            if (!event) {
+                return res.status(404).send('Event not found!');
+            }
+
+            if (String(register.eventId) !== String(event._id)) {
+                return res.status(400).send('No such register in event')
+            }
+
+            const { teams, error } = await this.teamRepository.duplicateTeams(teamsIds, event, register);
 
             if (error) {
                 const { status, msg } = error;

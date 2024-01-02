@@ -45,7 +45,7 @@ let TeamRepository = class TeamRepository {
     async getOne(options, populate = '') {
         return await Team.findOne(options).populate(populate, '-__v');
     }
-    async duplicateTeams(teamsIds, register) {
+    async duplicateTeams(teamsIds, event, register) {
         const dupTeams = { teams: [] };
         for (const teamId of teamsIds) {
             const team = await this.getOne({ _id: teamId });
@@ -53,7 +53,7 @@ let TeamRepository = class TeamRepository {
                 dupTeams.error = { status: 404, msg: 'Team not found!' };
                 return dupTeams;
             }
-            if (register.event && !register.event.categoriesIds.includes(team.categoryId)) {
+            if (!event.categoriesIds.includes(team.categoryId)) {
                 dupTeams.error = { status: 422, msg: "Categories does't match" };
                 return dupTeams;
             }

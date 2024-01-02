@@ -29,6 +29,7 @@ export interface ITeamParams {
 export interface IDuplicateParams {
     teamsIds: ITeam['id'][];
     registerId: IRegister['id'];
+    eventId: IEvent['id'];
 }
 
 export interface IDuplicateRes {
