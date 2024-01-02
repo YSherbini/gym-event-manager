@@ -8,20 +8,10 @@ import { injectable } from 'inversify';
 import Event from '../models/event.js';
 let EventRepository = class EventRepository {
     async getAllMatch(match) {
-        try {
-            return await Event.find(match);
-        }
-        catch (err) {
-            throw new Error('Coudnt get all events');
-        }
+        return await Event.find(match);
     }
     async getById(_id, populate = '') {
-        try {
-            return await Event.findById({ _id }).populate(populate, '-__v');
-        }
-        catch (err) {
-            throw new Error('Coudnt get event');
-        }
+        return await Event.findById({ _id }).populate(populate, '-__v');
     }
     applyQuery(eventQuery) {
         const match = {};
@@ -29,7 +19,7 @@ let EventRepository = class EventRepository {
         if (typeof name === 'string') {
             match['name'] = { $regex: new RegExp(name, 'i') };
         }
-        if (typeof categoryId === "string" && categoryId != "") {
+        if (typeof categoryId === 'string' && categoryId != '') {
             match['categoriesIds'] = categoryId;
         }
         return match;

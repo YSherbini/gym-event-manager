@@ -55,6 +55,9 @@ let GymOwnerRepository = class GymOwnerRepository {
         })
             .execPopulate();
     }
+    async getOne(options, populate = '') {
+        return await GymOwner.findOne(options).populate(populate, '-__v');
+    }
     async findByCredentials({ email, password }) {
         try {
             const gymOwner = await GymOwner.findOne({ email });
@@ -72,16 +75,11 @@ let GymOwnerRepository = class GymOwnerRepository {
         }
     }
     async generateAuthToken(gymOwner) {
-        try {
-            const dataStoredInToken = { _id: gymOwner._id.toString() };
-            const token = jwt.sign(dataStoredInToken, `${process.env.JWT_SECRET}`);
-            gymOwner.tokens = gymOwner.tokens.concat({ token });
-            await gymOwner.save();
-            return token;
-        }
-        catch (err) {
-            throw new Error('Unable to login!');
-        }
+        const dataStoredInToken = { _id: gymOwner._id.toString() };
+        const token = jwt.sign(dataStoredInToken, `${process.env.JWT_SECRET}`);
+        gymOwner.tokens = gymOwner.tokens.concat({ token });
+        await gymOwner.save();
+        return token;
     }
 };
 GymOwnerRepository = __decorate([

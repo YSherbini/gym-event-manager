@@ -18,26 +18,16 @@ let CategoryController = class CategoryController {
         this.categoryRepository = categoryRepository;
     }
     async allCategories(req, res) {
-        try {
-            const categories = await this.categoryRepository.getAll();
-            res.send(categories);
-        }
-        catch (err) {
-            res.status(400).json({ error: err.message });
-        }
+        const categories = await this.categoryRepository.getAll();
+        res.send(categories);
     }
     async category(req, res) {
         const { id } = req.params;
-        try {
-            const category = await this.categoryRepository.getById(id);
-            if (!category) {
-                return res.status(404).send('Category not found!');
-            }
-            res.send(category);
+        const category = await this.categoryRepository.getById(id);
+        if (!category) {
+            return res.status(404).send('Category not found!');
         }
-        catch (err) {
-            res.status(400).json({ error: err.message });
-        }
+        res.send(category);
     }
 };
 __decorate([

@@ -58,6 +58,10 @@ export class GymOwnerRepository {
             .execPopulate();
     }
 
+    async getOne(options: any, populate = '') {
+
+        return await GymOwner.findOne(options).populate(populate, '-__v');
+    }
     async findByCredentials({ email, password }: IGymOwnerAuthParams) {
         try {
             const gymOwner = await GymOwner.findOne({ email });
@@ -75,14 +79,13 @@ export class GymOwnerRepository {
     }
 
     async generateAuthToken(gymOwner: IGymOwner) {
-        try {
+        
             const dataStoredInToken: DataStoredInToken = { _id: gymOwner._id.toString() };
             const token = jwt.sign(dataStoredInToken, `${process.env.JWT_SECRET}`);
+            
             gymOwner.tokens = gymOwner.tokens.concat({ token });
             await gymOwner.save();
+            
             return token;
-        } catch (err) {
-            throw new Error('Unable to login!');
-        }
     }
 }

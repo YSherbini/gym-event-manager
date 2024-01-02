@@ -18,12 +18,7 @@ let GymOwnerController = class GymOwnerController {
         this.gymOwnerRepository = gymOwnerRepository;
     }
     async profile(req, res) {
-        try {
-            res.send(req.gymOwner);
-        }
-        catch (err) {
-            res.status(400).json({ error: err.message });
-        }
+        res.send(req.gymOwner);
     }
     async EditProfile(req, res) {
         const updates = req.body;

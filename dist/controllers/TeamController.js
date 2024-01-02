@@ -51,7 +51,7 @@ let TeamController = class TeamController {
         try {
             const register = await this.registerRepository.getOne({ _id: registerId, gymOwnerId }, 'event teams');
             if (teamsIds.length === 0) {
-                return res.status(400).send("No teams provided.");
+                return res.status(400).send('No teams provided.');
             }
             if (!register) {
                 return res.status(404).send('Register not found!');
@@ -80,39 +80,29 @@ let TeamController = class TeamController {
         }
         const { match, sort } = this.teamRepository.applyQuery(teamQuery, categoriesIds);
         const { skip, limit } = teamQuery;
-        try {
-            await this.gymOwnerRepository.getTeams(gymOwner, match, sort, skip, limit, 'teams');
-            res.send(gymOwner.teams);
-        }
-        catch (err) {
-            res.status(400).json({ error: err.message });
-        }
+        await this.gymOwnerRepository.getTeams(gymOwner, match, sort, skip, limit, 'teams');
+        res.send(gymOwner.teams);
     }
     async team(req, res) {
         const { id } = req.params;
-        try {
-            const team = await this.teamRepository.getOne({ _id: id }, 'category event');
-            if (!team) {
-                return res.status(404).send('Team not found!');
-            }
-            res.send(team);
+        const team = await this.teamRepository.getOne({ _id: id }, 'category event');
+        if (!team) {
+            return res.status(404).send('Team not found!');
         }
-        catch (err) {
-            res.status(400).json({ error: err.message });
-        }
+        res.send(team);
     }
     async editTeam(req, res) {
         const { id } = req.params;
-        const updates = req.body;
         const gymOwnerId = req.gymOwner._id;
+        const updates = req.body;
+        let team = await this.teamRepository.getOne({ _id: id, gymOwnerId }, 'event');
+        if (!team) {
+            return res.status(404).send('Team not found!');
+        }
+        if (updates.categoryId && team.event && !team.event.categoriesIds.includes(updates.categoryId)) {
+            return res.status(400).send('Categories doesnt match!');
+        }
         try {
-            let team = await this.teamRepository.getOne({ _id: id, gymOwnerId }, 'event');
-            if (!team) {
-                return res.status(404).send('Team not found!');
-            }
-            if (updates.categoryId && team.event && !team.event.categoriesIds.includes(updates.categoryId)) {
-                return res.status(400).send('Categories doesnt match!');
-            }
             team = await this.teamRepository.update(team, updates);
             res.send(team);
         }
@@ -123,11 +113,11 @@ let TeamController = class TeamController {
     async deleteTeam(req, res) {
         const { id } = req.params;
         const gymOwnerId = req.gymOwner._id;
+        const team = await this.teamRepository.getOne({ _id: id, gymOwnerId });
+        if (!team) {
+            return res.status(404).send('Team not found!');
+        }
         try {
-            const team = await this.teamRepository.getOne({ _id: id, gymOwnerId });
-            if (!team) {
-                return res.status(404).send('Team not found!');
-            }
             await this.teamRepository.remove(team);
             res.send();
         }

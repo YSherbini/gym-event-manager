@@ -2,7 +2,7 @@ import { injectable } from 'inversify';
 import Register from '../models/register.js';
 import { IRegister, IRegisterParams } from '../interfaces/IRegister.js';
 import { IQuery } from '../interfaces/IQuery.js';
-import { ObjectId } from 'mongodb'
+import { ObjectId } from 'mongodb';
 
 @injectable()
 export class RegisterRepository {
@@ -23,18 +23,11 @@ export class RegisterRepository {
         try {
             return await register.remove();
         } catch (err) {
-            throw new Error('Coudnt save!');
-        }
-    }
-
-    async alreadyExists(registerParams: IRegisterParams) {
-        if (await this.getOne(registerParams)) {
-            throw new Error('Already regestered!');
+            throw new Error('Coudnt remove!');
         }
     }
 
     async getAllMatch(match: any, eventMatch: any, populate = '') {
-        try {
             return await Register.aggregate([
                 {
                     $match: match,
@@ -65,17 +58,10 @@ export class RegisterRepository {
                     },
                 },
             ]);
-        } catch (err) {
-            throw new Error('Coudnt get registers!')
-        }
     }
 
     async getOne(options: any, populate = '') {
-        try {
-            return await Register.findOne(options).populate(populate, '-__v');
-        } catch (err) {
-            throw new Error('Coudnt get register');
-        }
+        return await Register.findOne(options).populate(populate, '-__v');
     }
 
     applyQuery(registerQuery: IQuery) {

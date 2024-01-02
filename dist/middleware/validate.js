@@ -1,4 +1,5 @@
-import GymOwner from "../models/gymOwner.js";
+import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
+import { container } from '../container/index.js';
 export const validateEmail = (req, res, next) => {
     const { email } = req.body;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -15,46 +16,44 @@ export const validatePassword = (req, res, next) => {
     }
     next();
 };
+export const validateName = (req, res, next) => {
+    const { name } = req.body;
+    if (!name) {
+        return res.status(422).json({ error: 'Name must be not empty' });
+    }
+    next();
+};
 export const checkExistingEmail = async (req, res, next) => {
+    const gymOwnerRepository = container.get(GymOwnerRepository);
     const { email } = req.body;
-    try {
-        const existingUser = await GymOwner.findOne({ email });
-        if (existingUser) {
-            return res.status(409).json({ error: 'Email already exists' });
-        }
-        next();
+    const existingUser = await gymOwnerRepository.getOne({ email });
+    if (existingUser) {
+        return res.status(409).json({ error: 'Email already exists' });
     }
-    catch (err) {
-        res.status(400).json({ error: err.message });
-    }
+    next();
 };
 export const validateEmailForUpdate = (req, res, next) => {
     const { email } = req.body;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (email == "" || email && !emailRegex.test(email)) {
+    if (email == '' || (email && !emailRegex.test(email))) {
         return res.status(422).json({ error: 'Invalid email format' });
     }
     next();
 };
 export const checkExistingEmailForUpdate = async (req, res, next) => {
+    const gymOwnerRepository = container.get(GymOwnerRepository);
     const { email } = req.body;
-    try {
-        const id = req.gymOwner._id;
-        const existingUser = await GymOwner.findOne({ email, _id: { $ne: id } });
-        if (existingUser) {
-            return res.status(409).json({ error: 'Email already exists' });
-        }
-        next();
+    const id = req.gymOwner._id;
+    const existingUser = await gymOwnerRepository.getOne({ email, _id: { $ne: id } });
+    if (existingUser) {
+        return res.status(409).json({ error: 'Email already exists' });
     }
-    catch (err) {
-        res.status(400).json({ error: err.message });
-    }
+    next();
 };
 export const isValidObjectId = (req, res, next) => {
     const { id } = req.params;
     if (!/^[0-9a-fA-F]{24}$/.test(id)) {
         return res.status(422).json({ error: 'Invalid ObjectId' });
-        ;
     }
     next();
 };

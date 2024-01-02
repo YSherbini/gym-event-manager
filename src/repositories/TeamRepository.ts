@@ -16,6 +16,7 @@ export class TeamRepository {
                 (team as any)[field] = fieldValue;
             }
         });
+
         return this.save(team);
     }
 
@@ -42,32 +43,36 @@ export class TeamRepository {
     }
 
     async getOne(options: any, populate = '') {
-        try {
-            return await Team.findOne(options).populate(populate, '-__v');
-        } catch (err) {
-            throw new Error('Coudnt get team');
-        }
+        return await Team.findOne(options).populate(populate, '-__v');
     }
 
     async duplicateTeams(teamsIds: ITeam[], register: IRegister) {
         const dupTeams = { teams: [] as ITeam[] } as IDuplicateRes;
-        try {
-            for (const teamId of teamsIds) {
-                const team = await this.getOne({ _id: teamId });
-                if (!team) {
-                    dupTeams.error = { status: 404, msg: 'Team not found!' };
-                    return dupTeams;
-                }
-                if (register.event && !register.event.categoriesIds.includes(team.categoryId)) {
-                    dupTeams.error = { status: 422, msg: "Categories does't match" };
-                    return dupTeams;
-                }
-                const { name, image, categoryId, gymOwnerId, registerId, eventId } = team;
-                const teamParams: ITeamParams = { name, image, categoryId, gymOwnerId, registerId, eventId };
-                const dupTeam = await this.create(teamParams);
-                dupTeams.teams.push(dupTeam);
+
+        for (const teamId of teamsIds) {
+            const team = await this.getOne({ _id: teamId });
+
+            if (!team) {
+                dupTeams.error = { status: 404, msg: 'Team not found!' };
+
+                return dupTeams;
             }
+
+            if (register.event && !register.event.categoriesIds.includes(team.categoryId)) {
+                dupTeams.error = { status: 422, msg: "Categories does't match" };
+
+                return dupTeams;
+            }
+            const { name, image, categoryId, gymOwnerId, registerId, eventId } = team;
+            const teamParams: ITeamParams = { name, image, categoryId, gymOwnerId, registerId, eventId };
+
+            const dupTeam = await this.create(teamParams);
+            dupTeams.teams.push(dupTeam);
+        }
+
+        try {
             await this.saveAll(dupTeams.teams);
+
             return dupTeams;
         } catch (err) {
             throw new Error();
@@ -77,16 +82,20 @@ export class TeamRepository {
     applyQuery({ categoryId, sortBy }: IQuery, categoriesIds: string[]) {
         let match = { $and: [] as any[] };
         const sort: Record<string, number> = {};
+
         if (categoryId) {
             match.$and.push({ categoryId });
         }
+
         if (categoriesIds.length > 0) {
             match.$and.push({ categoryId: { $in: categoriesIds } });
         }
+
         if (sortBy) {
             const [sortee, order] = sortBy.split(':');
             sort[sortee] = order === 'desc' ? -1 : 1;
         }
+        
         return { match, sort };
     }
 }

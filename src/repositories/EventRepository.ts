@@ -5,30 +5,22 @@ import { IQuery } from '../interfaces/IQuery.js';
 @injectable()
 export class EventRepository {
     async getAllMatch(match: any) {
-        try {
-            return await Event.find(match);
-        } catch (err) {
-            throw new Error('Coudnt get all events');
-        }
+        return await Event.find(match);
     }
 
     async getById(_id: string, populate = '') {
-        try {
-            return await Event.findById({ _id }).populate(populate, '-__v');
-        } catch (err) {
-            throw new Error('Coudnt get event');
-        }
+        return await Event.findById({ _id }).populate(populate, '-__v');
     }
 
     applyQuery(eventQuery: IQuery) {
-        const match: any = {}
-        const { name, categoryId } = eventQuery
+        const match: any = {};
+        const { name, categoryId } = eventQuery;
         if (typeof name === 'string') {
-            match['name'] = {$regex: new RegExp(name, 'i')}
+            match['name'] = { $regex: new RegExp(name, 'i') };
         }
-        if (typeof categoryId === "string" && categoryId != "") {
-            match['categoriesIds'] = categoryId
+        if (typeof categoryId === 'string' && categoryId != '') {
+            match['categoriesIds'] = categoryId;
         }
-        return match
+        return match;
     }
 }

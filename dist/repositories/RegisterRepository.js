@@ -25,58 +25,43 @@ let RegisterRepository = class RegisterRepository {
             return await register.remove();
         }
         catch (err) {
-            throw new Error('Coudnt save!');
-        }
-    }
-    async alreadyExists(registerParams) {
-        if (await this.getOne(registerParams)) {
-            throw new Error('Already regestered!');
+            throw new Error('Coudnt remove!');
         }
     }
     async getAllMatch(match, eventMatch, populate = '') {
-        try {
-            return await Register.aggregate([
-                {
-                    $match: match,
+        return await Register.aggregate([
+            {
+                $match: match,
+            },
+            {
+                $lookup: {
+                    from: 'events',
+                    localField: 'eventId',
+                    foreignField: '_id',
+                    as: 'eventDetails',
                 },
-                {
-                    $lookup: {
-                        from: 'events',
-                        localField: 'eventId',
-                        foreignField: '_id',
-                        as: 'eventDetails',
+            },
+            {
+                $match: {
+                    eventDetails: {
+                        $elemMatch: eventMatch,
                     },
                 },
-                {
-                    $match: {
-                        eventDetails: {
-                            $elemMatch: eventMatch,
-                        },
-                    },
+            },
+            {
+                $addFields: {
+                    event: { $arrayElemAt: ['$eventDetails', 0] },
                 },
-                {
-                    $addFields: {
-                        event: { $arrayElemAt: ['$eventDetails', 0] },
-                    },
+            },
+            {
+                $project: {
+                    eventDetails: 0,
                 },
-                {
-                    $project: {
-                        eventDetails: 0,
-                    },
-                },
-            ]);
-        }
-        catch (err) {
-            throw new Error('Coudnt get registers!');
-        }
+            },
+        ]);
     }
     async getOne(options, populate = '') {
-        try {
-            return await Register.findOne(options).populate(populate, '-__v');
-        }
-        catch (err) {
-            throw new Error('Coudnt get register');
-        }
+        return await Register.findOne(options).populate(populate, '-__v');
     }
     applyQuery(registerQuery) {
         const eventMatch = {};

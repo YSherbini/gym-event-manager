@@ -13,20 +13,18 @@ export class GymOwnerController {
 
     @httpGet('/', auth)
     async profile(req: IRequest, res: express.Response) {
-        try {
-            res.send(req.gymOwner);
-        } catch (err: any) {
-            res.status(400).json({ error: err.message });
-        }
+        res.send(req.gymOwner);
     }
 
     @httpPatch('/', auth, validateEmailForUpdate, checkExistingEmailForUpdate)
     async EditProfile(req: IRequest, res: express.Response) {
         const updates = req.body as IGymOwnerParams;
-        let { gymOwner } = req
+        let { gymOwner } = req;
+
         try {
             gymOwner = await this.gymOwnerRepository.update(gymOwner, updates);
-            res.send(gymOwner)
+
+            res.send(gymOwner);
         } catch (err: any) {
             res.status(400).json({ error: err.message });
         }
@@ -35,10 +33,12 @@ export class GymOwnerController {
     @httpPatch('/changePassword', auth, validatePassword)
     async changePassword(req: IRequest, res: express.Response) {
         const { password } = req.body;
-        let { gymOwner } = req
+        let { gymOwner } = req;
+
         try {
             gymOwner = await this.gymOwnerRepository.changePassword(gymOwner, password);
-            res.send()
+
+            res.send();
         } catch (err: any) {
             res.status(400).json({ error: err.message });
         }
@@ -47,8 +47,10 @@ export class GymOwnerController {
     @httpDelete('/', auth)
     async deleteProfile(req: IRequest, res: express.Response) {
         let { gymOwner } = req;
+
         try {
             gymOwner = await this.gymOwnerRepository.remove(gymOwner);
+
             res.send();
         } catch (err: any) {
             res.status(400).json({ error: err.message });

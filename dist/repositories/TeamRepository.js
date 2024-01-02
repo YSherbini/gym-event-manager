@@ -40,31 +40,26 @@ let TeamRepository = class TeamRepository {
         }
     }
     async getOne(options, populate = '') {
-        try {
-            return await Team.findOne(options).populate(populate, '-__v');
-        }
-        catch (err) {
-            throw new Error('Coudnt get team');
-        }
+        return await Team.findOne(options).populate(populate, '-__v');
     }
     async duplicateTeams(teamsIds, register) {
         const dupTeams = { teams: [] };
-        try {
-            for (const teamId of teamsIds) {
-                const team = await this.getOne({ _id: teamId });
-                if (!team) {
-                    dupTeams.error = { status: 404, msg: 'Team not found!' };
-                    return dupTeams;
-                }
-                if (register.event && !register.event.categoriesIds.includes(team.categoryId)) {
-                    dupTeams.error = { status: 422, msg: "Categories does't match" };
-                    return dupTeams;
-                }
-                const { name, image, categoryId, gymOwnerId, registerId, eventId } = team;
-                const teamParams = { name, image, categoryId, gymOwnerId, registerId, eventId };
-                const dupTeam = await this.create(teamParams);
-                dupTeams.teams.push(dupTeam);
+        for (const teamId of teamsIds) {
+            const team = await this.getOne({ _id: teamId });
+            if (!team) {
+                dupTeams.error = { status: 404, msg: 'Team not found!' };
+                return dupTeams;
             }
+            if (register.event && !register.event.categoriesIds.includes(team.categoryId)) {
+                dupTeams.error = { status: 422, msg: "Categories does't match" };
+                return dupTeams;
+            }
+            const { name, image, categoryId, gymOwnerId, registerId, eventId } = team;
+            const teamParams = { name, image, categoryId, gymOwnerId, registerId, eventId };
+            const dupTeam = await this.create(teamParams);
+            dupTeams.teams.push(dupTeam);
+        }
+        try {
             await this.saveAll(dupTeams.teams);
             return dupTeams;
         }

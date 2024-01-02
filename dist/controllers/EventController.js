@@ -23,28 +23,18 @@ let EventController = class EventController {
     async allEvents(req, res) {
         const eventQuery = req.query;
         const match = this.eventRepository.applyQuery(eventQuery);
-        try {
-            const events = await this.eventRepository.getAllMatch(match);
-            res.send(events);
-        }
-        catch (err) {
-            res.status(400).json({ error: err.message });
-        }
+        const events = await this.eventRepository.getAllMatch(match);
+        res.send(events);
     }
     async event(req, res) {
         const { id } = req.params;
         const gymOwnerId = req.gymOwner._id;
-        try {
-            const register = await this.registerRepository.getOne({ eventId: id, gymOwnerId }, 'teams');
-            const event = await this.eventRepository.getById(id, 'categories');
-            if (!event) {
-                return res.status(404).send('Event not found!');
-            }
-            return res.send({ ...event.toObject(), registerId: register?._id, teams: register?.teams });
+        const register = await this.registerRepository.getOne({ eventId: id, gymOwnerId }, 'teams');
+        const event = await this.eventRepository.getById(id, 'categories');
+        if (!event) {
+            return res.status(404).send('Event not found!');
         }
-        catch (err) {
-            res.status(400).json({ error: err.message });
-        }
+        return res.send({ ...event.toObject(), registerId: register?._id, teams: register?.teams });
     }
 };
 __decorate([

@@ -9,7 +9,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 import { controller, httpDelete, httpPost } from 'inversify-express-utils';
 import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
-import { checkExistingEmail, validateEmail, validatePassword } from '../middleware/validate.js';
+import { checkExistingEmail, validateName, validateEmail, validatePassword } from '../middleware/validate.js';
 import { inject } from 'inversify';
 import auth from '../middleware/auth.js';
 let GymOwnerAuthController = class GymOwnerAuthController {
@@ -19,14 +19,9 @@ let GymOwnerAuthController = class GymOwnerAuthController {
     }
     async signup(req, res) {
         const gymOwnerParams = req.body;
-        try {
-            const gymOwner = await this.gymOwnerRepository.createUser(gymOwnerParams);
-            const token = await this.gymOwnerRepository.generateAuthToken(gymOwner);
-            res.status(201).send({ token });
-        }
-        catch (err) {
-            res.status(400).json({ error: err.message });
-        }
+        const gymOwner = await this.gymOwnerRepository.createUser(gymOwnerParams);
+        const token = await this.gymOwnerRepository.generateAuthToken(gymOwner);
+        res.status(201).send({ token });
     }
     async login(req, res) {
         const gymOwnerParams = req.body;
@@ -52,7 +47,7 @@ let GymOwnerAuthController = class GymOwnerAuthController {
     }
 };
 __decorate([
-    httpPost('/signup', validateEmail, validatePassword, checkExistingEmail)
+    httpPost('/signup', validateName, validateEmail, validatePassword, checkExistingEmail)
 ], GymOwnerAuthController.prototype, "signup", null);
 __decorate([
     httpPost('/login', validateEmail, validatePassword)

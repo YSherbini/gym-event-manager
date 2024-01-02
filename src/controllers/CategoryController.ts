@@ -12,26 +12,21 @@ export class CategoryController {
 
     @httpGet('/', auth)
     async allCategories(req: IRequest, res: express.Response) {
-        try {
-            const categories = await this.categoryRepository.getAll()
-            res.send(categories)
-        } catch (err: any) {
-            res.status(400).json({ error: err.message });
-        }
+        const categories = await this.categoryRepository.getAll();
+
+        res.send(categories);
     }
 
     @httpGet('/:id', auth, isValidObjectId)
     async category(req: IRequest, res: express.Response) {
-        const { id } = req.params 
-        try {
-            const category = await this.categoryRepository.getById(id)
-            if (!category) {
-                return res.status(404).send('Category not found!')
-            }
-            res.send(category)
-        } catch (err: any) {
-            res.status(400).json({ error: err.message });
-        }
-    }
+        const { id } = req.params;
 
+        const category = await this.categoryRepository.getById(id);
+
+        if (!category) {
+            return res.status(404).send('Category not found!');
+        }
+        
+        res.send(category);
+    }
 }
