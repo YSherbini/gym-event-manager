@@ -54,19 +54,19 @@ let GymOwnerController = class GymOwnerController {
     }
 };
 __decorate([
-    httpGet('/', auth)
+    httpGet('/')
 ], GymOwnerController.prototype, "profile", null);
 __decorate([
-    httpPatch('/', auth, validateEmailForUpdate, checkExistingEmailForUpdate)
+    httpPatch('/', validateEmailForUpdate, checkExistingEmailForUpdate)
 ], GymOwnerController.prototype, "EditProfile", null);
 __decorate([
-    httpPatch('/changePassword', auth, validatePassword)
+    httpPatch('/changePassword', validatePassword)
 ], GymOwnerController.prototype, "changePassword", null);
 __decorate([
-    httpDelete('/', auth)
+    httpDelete('/')
 ], GymOwnerController.prototype, "deleteProfile", null);
 GymOwnerController = __decorate([
-    controller('/gymOwners/profile'),
+    controller('/gymOwners/profile', auth),
     __param(0, inject(GymOwnerRepository))
 ], GymOwnerController);
 export { GymOwnerController };

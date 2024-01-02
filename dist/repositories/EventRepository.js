@@ -16,10 +16,10 @@ let EventRepository = class EventRepository {
     applyQuery(eventQuery) {
         const match = {};
         const { name, categoryId } = eventQuery;
-        if (typeof name === 'string') {
+        if (name) {
             match['name'] = { $regex: new RegExp(name, 'i') };
         }
-        if (typeof categoryId === 'string' && categoryId != '') {
+        if (categoryId && categoryId != '') {
             match['categoriesIds'] = categoryId;
         }
         return match;

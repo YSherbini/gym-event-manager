@@ -7,16 +7,16 @@ import { IRequest } from '../interfaces/IRequest.js';
 import auth from '../middleware/auth.js';
 import { validateEmailForUpdate, checkExistingEmailForUpdate, validatePassword } from '../middleware/validate.js';
 
-@controller('/gymOwners/profile')
+@controller('/gymOwners/profile', auth)
 export class GymOwnerController {
     constructor(@inject(GymOwnerRepository) private readonly gymOwnerRepository: GymOwnerRepository) {}
 
-    @httpGet('/', auth)
+    @httpGet('/')
     async profile(req: IRequest, res: express.Response) {
         res.send(req.gymOwner);
     }
 
-    @httpPatch('/', auth, validateEmailForUpdate, checkExistingEmailForUpdate)
+    @httpPatch('/', validateEmailForUpdate, checkExistingEmailForUpdate)
     async EditProfile(req: IRequest, res: express.Response) {
         const updates = req.body as IGymOwnerParams;
         let { gymOwner } = req;
@@ -30,7 +30,7 @@ export class GymOwnerController {
         }
     }
 
-    @httpPatch('/changePassword', auth, validatePassword)
+    @httpPatch('/changePassword', validatePassword)
     async changePassword(req: IRequest, res: express.Response) {
         const { password } = req.body;
         let { gymOwner } = req;
@@ -44,7 +44,7 @@ export class GymOwnerController {
         }
     }
 
-    @httpDelete('/', auth)
+    @httpDelete('/')
     async deleteProfile(req: IRequest, res: express.Response) {
         let { gymOwner } = req;
 

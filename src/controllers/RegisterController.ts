@@ -6,14 +6,13 @@ import auth from '../middleware/auth.js';
 import { alreadyRegistered } from '../middleware/registerMiddleware.js';
 import { isValidObjectId } from '../middleware/validate.js';
 import { RegisterRepository } from '../repositories/RegisterRepository.js';
-import { IRegisterParams } from '../interfaces/IRegister.js';
-import { IQuery } from '../interfaces/IQuery.js';
+import { IRegisterQuery, IRegisterParams } from '../interfaces/IRegister.js';
 
-@controller('/registers')
+@controller('/registers', auth)
 export class RegisterController {
     constructor(@inject(RegisterRepository) private readonly registerRepository: RegisterRepository) {}
 
-    @httpPost('/', auth, alreadyRegistered)
+    @httpPost('/', alreadyRegistered)
     async createRegister(req: IRequest, res: express.Response) {
         const { eventId } = req.body as { eventId: string };
         const registerParams = { gymOwnerId: req.gymOwner._id, eventId } as IRegisterParams;
@@ -28,9 +27,9 @@ export class RegisterController {
         }
     }
 
-    @httpGet('/', auth)
+    @httpGet('/')
     async allRegisters(req: IRequest, res: express.Response) {
-        const registerQuery = req.query as IQuery;
+        const registerQuery = req.query as IRegisterQuery;
         const gymOwnerId = req.gymOwner._id;
 
         const eventMatch = this.registerRepository.applyQuery(registerQuery);
@@ -39,7 +38,7 @@ export class RegisterController {
         res.send(registers);
     }
 
-    @httpGet('/:id', auth, isValidObjectId)
+    @httpGet('/:id', isValidObjectId)
     async register(req: IRequest, res: express.Response) {
         const { id } = req.params;
         const gymOwnerId = req.gymOwner._id;
@@ -53,7 +52,7 @@ export class RegisterController {
         res.send(register);
     }
 
-    @httpDelete('/:id', auth, isValidObjectId)
+    @httpDelete('/:id', isValidObjectId)
     async unregister(req: IRequest, res: express.Response) {
         const { id } = req.params;
         const gymOwnerId = req.gymOwner._id;

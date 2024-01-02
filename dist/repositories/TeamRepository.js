@@ -6,8 +6,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 import { injectable } from 'inversify';
 import Team from '../models/team.js';
+var SortOrder;
+(function (SortOrder) {
+    SortOrder[SortOrder["asc"] = 1] = "asc";
+    SortOrder[SortOrder["desc"] = -1] = "desc";
+})(SortOrder || (SortOrder = {}));
 let TeamRepository = class TeamRepository {
-    async create(teamParams) {
+    create(teamParams) {
         return new Team(teamParams);
     }
     async update(team, updates) {
@@ -27,9 +32,7 @@ let TeamRepository = class TeamRepository {
         }
     }
     async saveAll(teams) {
-        for (const team of teams) {
-            await this.save(team);
-        }
+        await Promise.all(teams.map((team) => this.save(team)));
     }
     async remove(team) {
         try {
@@ -54,9 +57,7 @@ let TeamRepository = class TeamRepository {
                 dupTeams.error = { status: 422, msg: "Categories does't match" };
                 return dupTeams;
             }
-            const { name, image, categoryId, gymOwnerId, registerId, eventId } = team;
-            const teamParams = { name, image, categoryId, gymOwnerId, registerId, eventId };
-            const dupTeam = await this.create(teamParams);
+            const dupTeam = this.create({ ...team.toObject(), id: undefined, _id: undefined });
             dupTeams.teams.push(dupTeam);
         }
         try {
@@ -76,9 +77,12 @@ let TeamRepository = class TeamRepository {
         if (categoriesIds.length > 0) {
             match.$and.push({ categoryId: { $in: categoriesIds } });
         }
+        if (match.$and.length === 0) {
+            match = {};
+        }
         if (sortBy) {
             const [sortee, order] = sortBy.split(':');
-            sort[sortee] = order === 'desc' ? -1 : 1;
+            sort[sortee] = order === 'desc' ? SortOrder.desc : SortOrder.asc;
         }
         return { match, sort };
     }

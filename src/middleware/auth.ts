@@ -8,7 +8,7 @@ const auth = async (req: express.Request, res: express.Response, next: express.N
     try {
         const token = req.header('Authorization')?.replace('Bearer ', '');
 
-        if (typeof token === 'string') {
+        if (token) {
             const decoded = jwt.verify(token, `${process.env.JWT_SECRET}`) as DataStoredInToken;
             const gymOwner = await GymOwner.findOne({ _id: decoded._id, 'tokens.token': token });
 

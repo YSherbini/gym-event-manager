@@ -1,7 +1,6 @@
 import { injectable } from 'inversify';
 import Register from '../models/register.js';
-import { IRegister, IRegisterParams } from '../interfaces/IRegister.js';
-import { IQuery } from '../interfaces/IQuery.js';
+import { IRegister, IRegisterQuery, IRegisterParams } from '../interfaces/IRegister.js';
 import { ObjectId } from 'mongodb';
 
 @injectable()
@@ -64,13 +63,13 @@ export class RegisterRepository {
         return await Register.findOne(options).populate(populate, '-__v');
     }
 
-    applyQuery(registerQuery: IQuery) {
+    applyQuery(registerQuery: IRegisterQuery) {
         const eventMatch: any = {};
         const { name, categoryId } = registerQuery;
-        if (typeof name === 'string') {
+        if (name) {
             eventMatch['name'] = { $regex: new RegExp(name, 'i') };
         }
-        if (typeof categoryId === 'string' && categoryId != '') {
+        if (categoryId && categoryId != '') {
             eventMatch['categoriesIds'] = new ObjectId(categoryId);
         }
         return eventMatch;

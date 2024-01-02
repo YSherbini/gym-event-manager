@@ -66,10 +66,10 @@ let RegisterRepository = class RegisterRepository {
     applyQuery(registerQuery) {
         const eventMatch = {};
         const { name, categoryId } = registerQuery;
-        if (typeof name === 'string') {
+        if (name) {
             eventMatch['name'] = { $regex: new RegExp(name, 'i') };
         }
-        if (typeof categoryId === 'string' && categoryId != '') {
+        if (categoryId && categoryId != '') {
             eventMatch['categoriesIds'] = new ObjectId(categoryId);
         }
         return eventMatch;

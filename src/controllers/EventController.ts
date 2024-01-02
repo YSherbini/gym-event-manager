@@ -6,18 +6,18 @@ import { IRequest } from '../interfaces/IRequest.js';
 import auth from '../middleware/auth.js';
 import { isValidObjectId } from '../middleware/validate.js';
 import { RegisterRepository } from '../repositories/RegisterRepository.js';
-import { IQuery } from '../interfaces/IQuery.js';
+import { IEventQuery } from '../interfaces/IEvent.js';
 
-@controller('/events')
+@controller('/events', auth)
 export class EventController {
     constructor(
         @inject(EventRepository) private readonly eventRepository: EventRepository,
         @inject(RegisterRepository) private readonly registerRepository: RegisterRepository
     ) {}
 
-    @httpGet('/', auth)
+    @httpGet('/')
     async allEvents(req: IRequest, res: express.Response) {
-        const eventQuery = req.query as IQuery;
+        const eventQuery = req.query as IEventQuery;
 
         const match = this.eventRepository.applyQuery(eventQuery);
         const events = await this.eventRepository.getAllMatch(match);
@@ -25,7 +25,7 @@ export class EventController {
         res.send(events);
     }
 
-    @httpGet('/:id', auth, isValidObjectId)
+    @httpGet('/:id', isValidObjectId)
     async event(req: IRequest, res: express.Response) {
         const { id } = req.params;
         const gymOwnerId = req.gymOwner._id;

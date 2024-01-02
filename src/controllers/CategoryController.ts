@@ -6,18 +6,18 @@ import { IRequest } from '../interfaces/IRequest.js';
 import auth from '../middleware/auth.js';
 import { isValidObjectId } from '../middleware/validate.js';
 
-@controller('/categories')
+@controller('/categories', auth)
 export class CategoryController {
     constructor(@inject(CategoryRepository) private readonly categoryRepository: CategoryRepository) {}
 
-    @httpGet('/', auth)
+    @httpGet('/')
     async allCategories(req: IRequest, res: express.Response) {
         const categories = await this.categoryRepository.getAll();
 
         res.send(categories);
     }
 
-    @httpGet('/:id', auth, isValidObjectId)
+    @httpGet('/:id', isValidObjectId)
     async category(req: IRequest, res: express.Response) {
         const { id } = req.params;
 

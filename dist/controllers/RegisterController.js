@@ -63,19 +63,19 @@ let RegisterController = class RegisterController {
     }
 };
 __decorate([
-    httpPost('/', auth, alreadyRegistered)
+    httpPost('/', alreadyRegistered)
 ], RegisterController.prototype, "createRegister", null);
 __decorate([
-    httpGet('/', auth)
+    httpGet('/')
 ], RegisterController.prototype, "allRegisters", null);
 __decorate([
-    httpGet('/:id', auth, isValidObjectId)
+    httpGet('/:id', isValidObjectId)
 ], RegisterController.prototype, "register", null);
 __decorate([
-    httpDelete('/:id', auth, isValidObjectId)
+    httpDelete('/:id', isValidObjectId)
 ], RegisterController.prototype, "unregister", null);
 RegisterController = __decorate([
-    controller('/registers'),
+    controller('/registers', auth),
     __param(0, inject(RegisterRepository))
 ], RegisterController);
 export { RegisterController };

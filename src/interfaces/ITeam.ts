@@ -35,3 +35,11 @@ export interface IDuplicateRes {
     teams: ITeam[];
     error: { status: number; msg: string };
 }
+
+export interface ITeamQuery {
+    categoryId?: ICategory['_id'];
+    eventId?: IEvent['_id']
+    sortBy?: string;
+    limit?: string;
+    skip?: string;
+};

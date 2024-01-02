@@ -38,13 +38,13 @@ let EventController = class EventController {
     }
 };
 __decorate([
-    httpGet('/', auth)
+    httpGet('/')
 ], EventController.prototype, "allEvents", null);
 __decorate([
-    httpGet('/:id', auth, isValidObjectId)
+    httpGet('/:id', isValidObjectId)
 ], EventController.prototype, "event", null);
 EventController = __decorate([
-    controller('/events'),
+    controller('/events', auth),
     __param(0, inject(EventRepository)),
     __param(1, inject(RegisterRepository))
 ], EventController);

@@ -31,13 +31,13 @@ let CategoryController = class CategoryController {
     }
 };
 __decorate([
-    httpGet('/', auth)
+    httpGet('/')
 ], CategoryController.prototype, "allCategories", null);
 __decorate([
-    httpGet('/:id', auth, isValidObjectId)
+    httpGet('/:id', isValidObjectId)
 ], CategoryController.prototype, "category", null);
 CategoryController = __decorate([
-    controller('/categories'),
+    controller('/categories', auth),
     __param(0, inject(CategoryRepository))
 ], CategoryController);
 export { CategoryController };

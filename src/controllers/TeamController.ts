@@ -5,13 +5,12 @@ import { IRequest } from '../interfaces/IRequest.js';
 import auth from '../middleware/auth.js';
 import { isValidObjectId } from '../middleware/validate.js';
 import { TeamRepository } from '../repositories/TeamRepository.js';
-import { ITeam, IDuplicateParams, ITeamParams } from '../interfaces/ITeam.js';
-import { IQuery } from '../interfaces/IQuery.js';
+import { ITeamQuery, IDuplicateParams, ITeamParams } from '../interfaces/ITeam.js';
 import { RegisterRepository } from '../repositories/RegisterRepository.js';
 import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
 import { EventRepository } from '../repositories/EventRepository.js';
 
-@controller('/teams')
+@controller('/teams', auth)
 export class TeamController {
     constructor(
         @inject(TeamRepository) private readonly teamRepository: TeamRepository,
@@ -20,7 +19,7 @@ export class TeamController {
         @inject(GymOwnerRepository) private readonly gymOwnerRepository: GymOwnerRepository
     ) {}
 
-    @httpPost('/', auth)
+    @httpPost('/')
     async addTeam(req: IRequest, res: express.Response) {
         const { name, categoryId, registerId } = req.body as ITeamParams;
         const gymOwnerId = req.gymOwner._id;
@@ -36,7 +35,7 @@ export class TeamController {
                 return res.status(400).send('Categories doesnt match!');
             }
 
-            let team = await this.teamRepository.create({ name, categoryId, registerId, gymOwnerId, eventId: register.eventId });
+            let team = this.teamRepository.create({ name, categoryId, registerId, gymOwnerId, eventId: register.eventId });
             team = await this.teamRepository.save(team);
 
             res.status(201).send(team);
@@ -45,7 +44,7 @@ export class TeamController {
         }
     }
 
-    @httpPost('/duplicate', auth)
+    @httpPost('/duplicate')
     async duplicateTeams(req: IRequest, res: express.Response) {
         const { teamsIds, registerId } = req.body as IDuplicateParams;
         const gymOwnerId = req.gymOwner._id;
@@ -76,9 +75,9 @@ export class TeamController {
         }
     }
 
-    @httpGet('/', auth)
+    @httpGet('/')
     async myTeams(req: IRequest, res: express.Response) {
-        const teamQuery = req.query as IQuery;
+        const teamQuery = req.query as ITeamQuery;
         const { gymOwner } = req;
 
         let categoriesIds: string[] = [];
@@ -98,7 +97,7 @@ export class TeamController {
         res.send(gymOwner.teams);
     }
 
-    @httpGet('/:id', auth, isValidObjectId)
+    @httpGet('/:id', isValidObjectId)
     async team(req: IRequest, res: express.Response) {
         const { id } = req.params;
 
@@ -111,7 +110,7 @@ export class TeamController {
         res.send(team);
     }
 
-    @httpPatch('/:id', auth, isValidObjectId)
+    @httpPatch('/:id', isValidObjectId)
     async editTeam(req: IRequest, res: express.Response) {
         const { id } = req.params;
         const gymOwnerId = req.gymOwner._id;
@@ -136,7 +135,7 @@ export class TeamController {
         }
     }
 
-    @httpDelete('/:id', auth, isValidObjectId)
+    @httpDelete('/:id', isValidObjectId)
     async deleteTeam(req: IRequest, res: express.Response) {
         const { id } = req.params;
         const gymOwnerId = req.gymOwner._id;

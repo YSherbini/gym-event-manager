@@ -1,12 +1,17 @@
 import { injectable } from 'inversify';
 import Team from '../models/team.js';
 import { IDuplicateRes, ITeam, ITeamParams } from '../interfaces/ITeam.js';
-import { IQuery } from '../interfaces/IQuery.js';
+import { ITeamQuery } from '../interfaces/ITeam.js';
 import { IRegister } from 'interfaces/IRegister.js';
+
+enum SortOrder {
+    asc = 1,
+    desc = -1,
+}
 
 @injectable()
 export class TeamRepository {
-    async create(teamParams: ITeamParams) {
+    create(teamParams: ITeamParams) {
         return new Team(teamParams);
     }
 
@@ -29,9 +34,7 @@ export class TeamRepository {
     }
 
     async saveAll(teams: ITeam[]) {
-        for (const team of teams) {
-            await this.save(team);
-        }
+        await Promise.all(teams.map((team) => this.save(team)));
     }
 
     async remove(team: ITeam) {
@@ -63,10 +66,8 @@ export class TeamRepository {
 
                 return dupTeams;
             }
-            const { name, image, categoryId, gymOwnerId, registerId, eventId } = team;
-            const teamParams: ITeamParams = { name, image, categoryId, gymOwnerId, registerId, eventId };
 
-            const dupTeam = await this.create(teamParams);
+            const dupTeam = this.create({ ...team.toObject(), id: undefined, _id: undefined } as ITeam);
             dupTeams.teams.push(dupTeam);
         }
 
@@ -79,8 +80,8 @@ export class TeamRepository {
         }
     }
 
-    applyQuery({ categoryId, sortBy }: IQuery, categoriesIds: string[]) {
-        let match = { $and: [] as any[] };
+    applyQuery({ categoryId, sortBy }: ITeamQuery, categoriesIds: string[]) {
+        let match: any = { $and: [] as any[] };
         const sort: Record<string, number> = {};
 
         if (categoryId) {
@@ -91,11 +92,15 @@ export class TeamRepository {
             match.$and.push({ categoryId: { $in: categoriesIds } });
         }
 
+        if (match.$and.length === 0) {
+            match = {};
+        }
+
         if (sortBy) {
             const [sortee, order] = sortBy.split(':');
-            sort[sortee] = order === 'desc' ? -1 : 1;
+            sort[sortee] = order === 'desc' ? SortOrder.desc : SortOrder.asc;
         }
-        
+
         return { match, sort };
     }
 }

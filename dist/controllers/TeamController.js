@@ -37,7 +37,7 @@ let TeamController = class TeamController {
             if (register.event && !register.event.categoriesIds.includes(categoryId)) {
                 return res.status(400).send('Categories doesnt match!');
             }
-            let team = await this.teamRepository.create({ name, categoryId, registerId, gymOwnerId, eventId: register.eventId });
+            let team = this.teamRepository.create({ name, categoryId, registerId, gymOwnerId, eventId: register.eventId });
             team = await this.teamRepository.save(team);
             res.status(201).send(team);
         }
@@ -127,25 +127,25 @@ let TeamController = class TeamController {
     }
 };
 __decorate([
-    httpPost('/', auth)
+    httpPost('/')
 ], TeamController.prototype, "addTeam", null);
 __decorate([
-    httpPost('/duplicate', auth)
+    httpPost('/duplicate')
 ], TeamController.prototype, "duplicateTeams", null);
 __decorate([
-    httpGet('/', auth)
+    httpGet('/')
 ], TeamController.prototype, "myTeams", null);
 __decorate([
-    httpGet('/:id', auth, isValidObjectId)
+    httpGet('/:id', isValidObjectId)
 ], TeamController.prototype, "team", null);
 __decorate([
-    httpPatch('/:id', auth, isValidObjectId)
+    httpPatch('/:id', isValidObjectId)
 ], TeamController.prototype, "editTeam", null);
 __decorate([
-    httpDelete('/:id', auth, isValidObjectId)
+    httpDelete('/:id', isValidObjectId)
 ], TeamController.prototype, "deleteTeam", null);
 TeamController = __decorate([
-    controller('/teams'),
+    controller('/teams', auth),
     __param(0, inject(TeamRepository)),
     __param(1, inject(RegisterRepository)),
     __param(2, inject(EventRepository)),

@@ -31,16 +31,19 @@ export class GymOwnerRepository {
                 (gymOwner as any)[field] = fieldValue;
             }
         });
-        return this.save(gymOwner)
+
+        return this.save(gymOwner);
     }
 
     async changePassword(gymOwner: IGymOwner, password: string) {
         gymOwner.password = password;
-        return this.save(gymOwner)
+
+        return this.save(gymOwner);
     }
 
     async createUser(gymOwnerParams: IGymOwnerAuthParams) {
         const gymOwner = new GymOwner(gymOwnerParams);
+
         return this.save(gymOwner);
     }
 
@@ -59,19 +62,23 @@ export class GymOwnerRepository {
     }
 
     async getOne(options: any, populate = '') {
-
         return await GymOwner.findOne(options).populate(populate, '-__v');
     }
+
     async findByCredentials({ email, password }: IGymOwnerAuthParams) {
         try {
             const gymOwner = await GymOwner.findOne({ email });
+
             if (!gymOwner) {
                 throw new Error();
             }
+
             const isMatch = await bcrypt.compare(password, gymOwner.password);
+
             if (!isMatch) {
                 throw new Error();
             }
+
             return gymOwner;
         } catch (err) {
             throw new Error('Invalid credentials!');
@@ -79,13 +86,12 @@ export class GymOwnerRepository {
     }
 
     async generateAuthToken(gymOwner: IGymOwner) {
-        
-            const dataStoredInToken: DataStoredInToken = { _id: gymOwner._id.toString() };
-            const token = jwt.sign(dataStoredInToken, `${process.env.JWT_SECRET}`);
-            
-            gymOwner.tokens = gymOwner.tokens.concat({ token });
-            await gymOwner.save();
-            
-            return token;
+        const dataStoredInToken: DataStoredInToken = { _id: gymOwner._id.toString() };
+        const token = jwt.sign(dataStoredInToken, `${process.env.JWT_SECRET}`);
+
+        gymOwner.tokens = gymOwner.tokens.concat({ token });
+        await gymOwner.save();
+
+        return token;
     }
 }
