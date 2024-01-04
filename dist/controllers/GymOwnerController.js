@@ -11,7 +11,7 @@ import { controller, httpPatch, httpDelete, httpGet } from 'inversify-express-ut
 import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
 import { inject } from 'inversify';
 import auth from '../middleware/auth.js';
-import { validateEmailForUpdate, checkExistingEmailForUpdate, validatePassword } from '../middleware/validate.js';
+import { validateEmailForUpdate, checkExistingEmailForUpdate, validatePassword, validateName } from '../middleware/validate.js';
 let GymOwnerController = class GymOwnerController {
     gymOwnerRepository;
     constructor(gymOwnerRepository) {
@@ -57,7 +57,7 @@ __decorate([
     httpGet('/')
 ], GymOwnerController.prototype, "profile", null);
 __decorate([
-    httpPatch('/', validateEmailForUpdate, checkExistingEmailForUpdate)
+    httpPatch('/', validateName, validateEmailForUpdate, checkExistingEmailForUpdate)
 ], GymOwnerController.prototype, "EditProfile", null);
 __decorate([
     httpPatch('/changePassword', validatePassword)
