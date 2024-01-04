@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import Team from "./team.js";
-import { IRegister } from "../interfaces/Register.interface.js";
+import Team from "./team";
+import { IRegister } from "../interfaces/IRegister";
 
 const registerSchema = new mongoose.Schema({
     eventId: {

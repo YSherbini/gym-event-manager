@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
-import Register from './register.js'
-import { IEvent } from '../interfaces/Event.interface.js'
+import Register from './register'
+import { IEvent } from '../interfaces/IEvent'
 
 const eventSchema = new mongoose.Schema({
     name: {

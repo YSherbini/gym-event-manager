@@ -1,12 +1,17 @@
-import mongoose from "mongoose";
-const teamSchema = new mongoose.Schema({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const teamSchema = new mongoose_1.default.Schema({
     name: {
         type: String,
         required: true,
         trim: true,
     },
     categoryId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'Category',
         required: true,
     },
@@ -15,17 +20,17 @@ const teamSchema = new mongoose.Schema({
         default: ""
     },
     gymOwnerId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'GymOwner',
         required: true
     },
     registerId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'Register',
         required: true
     },
     eventId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'Event',
         required: true
     }
@@ -57,6 +62,5 @@ teamSchema.methods.toJSON = function () {
     delete teamObject.__v;
     return teamObject;
 };
-const Team = mongoose.model('Team', teamSchema);
-export default Team;
-//# sourceMappingURL=team.js.map
+const Team = mongoose_1.default.model('Team', teamSchema);
+exports.default = Team;

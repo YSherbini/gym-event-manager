@@ -1,8 +1,9 @@
-import mongoose, { HookNextFunction, PostMiddlewareFunction } from 'mongoose'
+import mongoose from 'mongoose'
 import 'dotenv/config'
-import Team from './team.js'
-import Register from './register.js'
-import { IGymOwner } from '../interfaces/GymOwner.interface.js'
+import bcrypt from 'bcrypt'
+import Team from './team'
+import Register from './register'
+import { IGymOwner } from '../interfaces/IGymOwner'
 
 const gymOwnerSchema = new mongoose.Schema({
     name: {
@@ -49,13 +50,13 @@ gymOwnerSchema.methods.toJSON = function() {
     return gymOwnerObject
 }
 
-// gymOwnerSchema.pre('save', async function (this: IGymOwner, next) {
-//     const gymOwner = this
-//     if (gymOwner.isModified('password')) {
-//         gymOwner.password = await bcrypt.hash(gymOwner.password, 8)
-//     }
-//     next()
-// })
+gymOwnerSchema.pre('save', async function (this: IGymOwner, next) {
+    const gymOwner = this
+    if (gymOwner.isModified('password')) {
+        gymOwner.password = await bcrypt.hash(gymOwner.password, 8)
+    }
+    next()
+})
 
 gymOwnerSchema.post<IGymOwner>('remove', async function (gymOwner: IGymOwner, next) {
     await Team.deleteMany({ gymOwnerId: gymOwner._id })
