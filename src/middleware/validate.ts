@@ -27,7 +27,7 @@ export const validatePassword = (req: express.Request, res: express.Response, ne
 
 export const validateName = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { name } = req.body;
-    
+
     if (!name) {
         return res.status(422).json({ error: 'Name must be not empty' });
     }
@@ -70,6 +70,16 @@ export const checkExistingEmailForUpdate = async (req: express.Request, res: exp
 
     if (existingUser) {
         return res.status(409).json({ error: 'Email already exists' });
+    }
+
+    next();
+};
+
+export const validateNameForUpdate = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const { name } = req.body;
+
+    if (name === '') {
+        return res.status(422).json({ error: 'Name must be not empty' });
     }
 
     next();

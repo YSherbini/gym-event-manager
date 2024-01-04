@@ -5,7 +5,7 @@ import { IGymOwnerParams } from '../interfaces/IGymOwner';
 import { inject } from 'inversify';
 import { IRequest } from '../interfaces/IRequest';
 import auth from '../middleware/auth';
-import { validateEmailForUpdate, checkExistingEmailForUpdate, validatePassword, validateName } from '../middleware/validate';
+import { validateEmailForUpdate, checkExistingEmailForUpdate, validatePassword, validateNameForUpdate } from '../middleware/validate';
 
 @controller('/gymOwners/profile', auth)
 export class GymOwnerController {
@@ -16,7 +16,7 @@ export class GymOwnerController {
         res.send(req.gymOwner);
     }
 
-    @httpPatch('/', validateName, validateEmailForUpdate, checkExistingEmailForUpdate)
+    @httpPatch('/', validateNameForUpdate, validateEmailForUpdate, checkExistingEmailForUpdate)
     async EditProfile(req: IRequest, res: express.Response) {
         const updates = req.body as IGymOwnerParams;
         let { gymOwner } = req;

@@ -87,7 +87,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], GymOwnerController.prototype, "profile", null);
 __decorate([
-    (0, inversify_express_utils_1.httpPatch)('/', validate_1.validateName, validate_1.validateEmailForUpdate, validate_1.checkExistingEmailForUpdate),
+    (0, inversify_express_utils_1.httpPatch)('/', validate_1.validateNameForUpdate, validate_1.validateEmailForUpdate, validate_1.checkExistingEmailForUpdate),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)

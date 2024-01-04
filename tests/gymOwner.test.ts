@@ -103,7 +103,7 @@ test('Should not update invalid user fields', async () => {
         .patch('/gymOwners/profile')
         .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
         .send({
-            specs: "asd"
+            name: ""
         })
         .expect(422);
 });
