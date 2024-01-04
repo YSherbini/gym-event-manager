@@ -1,12 +1,12 @@
 import express from 'express';
 import { controller, httpDelete, httpGet, httpPost } from 'inversify-express-utils';
 import { inject } from 'inversify';
-import { IRequest } from '../interfaces/IRequest.js';
-import auth from '../middleware/auth.js';
-import { alreadyRegistered } from '../middleware/registerMiddleware.js';
-import { isValidObjectId } from '../middleware/validate.js';
-import { RegisterRepository } from '../repositories/RegisterRepository.js';
-import { IRegisterQuery, IRegisterParams } from '../interfaces/IRegister.js';
+import { IRequest } from '../interfaces/IRequest';
+import auth from '../middleware/auth';
+import { alreadyRegistered } from '../middleware/registerMiddleware';
+import { isValidObjectId } from '../middleware/validate';
+import { RegisterRepository } from '../repositories/RegisterRepository';
+import { IRegisterQuery, IRegisterParams } from '../interfaces/IRegister';
 
 @controller('/registers', auth)
 export class RegisterController {

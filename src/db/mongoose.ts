@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import 'dotenv/config';
+import '../config/index'
 import { injectable } from 'inversify';
 
 @injectable()

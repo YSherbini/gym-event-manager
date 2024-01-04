@@ -1,6 +1,6 @@
-import './GymOwnerController.js';
-import './GymOwnerAuthController.js';
-import './CategoryController.js'
-import './EventController.js'
-import './RegisterController.js'
-import './TeamController.js'
+import './GymOwnerController';
+import './GymOwnerAuthController';
+import './CategoryController'
+import './EventController'
+import './RegisterController'
+import './TeamController'

@@ -1,9 +1,9 @@
 import { injectable } from 'inversify';
-import Team from '../models/team.js';
-import { IDuplicateRes, ITeam, ITeamParams } from '../interfaces/ITeam.js';
-import { ITeamQuery } from '../interfaces/ITeam.js';
-import { IRegister } from 'interfaces/IRegister.js';
-import { IEvent } from 'interfaces/IEvent.js';
+import Team from '../models/team';
+import { IDuplicateRes, ITeam, ITeamParams } from '../interfaces/ITeam';
+import { ITeamQuery } from '../interfaces/ITeam';
+import { IRegister } from '../interfaces/IRegister';
+import { IEvent } from '../interfaces/IEvent';
 
 enum SortOrder {
     asc = 1,

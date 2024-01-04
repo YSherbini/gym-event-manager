@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import Category from '../models/category.js';
+import Category from '../models/category';
 
 @injectable()
 export class CategoryRepository {

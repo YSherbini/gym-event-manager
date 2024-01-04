@@ -1,7 +1,8 @@
-import './GymOwnerController.js';
-import './GymOwnerAuthController.js';
-import './CategoryController.js';
-import './EventController.js';
-import './RegisterController.js';
-import './TeamController.js';
-//# sourceMappingURL=index.js.map
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+require("./GymOwnerController");
+require("./GymOwnerAuthController");
+require("./CategoryController");
+require("./EventController");
+require("./RegisterController");
+require("./TeamController");

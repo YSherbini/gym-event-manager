@@ -1,12 +1,12 @@
 import express from 'express';
 import { controller, httpGet } from 'inversify-express-utils';
-import { EventRepository } from '../repositories/EventRepository.js';
+import { EventRepository } from '../repositories/EventRepository';
 import { inject } from 'inversify';
-import { IRequest } from '../interfaces/IRequest.js';
-import auth from '../middleware/auth.js';
-import { isValidObjectId } from '../middleware/validate.js';
-import { RegisterRepository } from '../repositories/RegisterRepository.js';
-import { IEventQuery } from '../interfaces/IEvent.js';
+import { IRequest } from '../interfaces/IRequest';
+import auth from '../middleware/auth';
+import { isValidObjectId } from '../middleware/validate';
+import { RegisterRepository } from '../repositories/RegisterRepository';
+import { IEventQuery } from '../interfaces/IEvent';
 
 @controller('/events', auth)
 export class EventController {

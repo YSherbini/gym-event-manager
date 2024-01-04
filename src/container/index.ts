@@ -1,10 +1,10 @@
-import { DBService } from "../db/mongoose.js";
+import { DBService } from "../db/mongoose";
 import { Container } from "inversify";
-import { CategoryRepository } from "../repositories/CategoryRepository.js";
-import { GymOwnerRepository } from "../repositories/GymOwnerRepository.js";
-import { EventRepository } from "../repositories/EventRepository.js";
-import { RegisterRepository } from "../repositories/RegisterRepository.js";
-import { TeamRepository } from "../repositories/TeamRepository.js";
+import { CategoryRepository } from "../repositories/CategoryRepository";
+import { GymOwnerRepository } from "../repositories/GymOwnerRepository";
+import { EventRepository } from "../repositories/EventRepository";
+import { RegisterRepository } from "../repositories/RegisterRepository";
+import { TeamRepository } from "../repositories/TeamRepository";
 
 export const container = new Container({
     defaultScope: 'Singleton'

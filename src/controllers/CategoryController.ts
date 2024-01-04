@@ -1,10 +1,10 @@
 import express from 'express';
 import { controller, httpGet } from 'inversify-express-utils';
-import { CategoryRepository } from '../repositories/CategoryRepository.js';
+import { CategoryRepository } from '../repositories/CategoryRepository';
 import { inject } from 'inversify';
-import { IRequest } from '../interfaces/IRequest.js';
-import auth from '../middleware/auth.js';
-import { isValidObjectId } from '../middleware/validate.js';
+import { IRequest } from '../interfaces/IRequest';
+import auth from '../middleware/auth';
+import { isValidObjectId } from '../middleware/validate';
 
 @controller('/categories', auth)
 export class CategoryController {

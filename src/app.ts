@@ -1,17 +1,19 @@
 import express from 'express';
 import { InversifyExpressServer } from 'inversify-express-utils';
 
-import AdminPanel from './adminjs/index.js';
+import AdminPanel from './admin-bro/index';
 
-import { container } from './container/index.js';
-import { DBService } from './db/mongoose.js';
+import './controllers/index'
+
+
+import { container } from './container/index';
+import { DBService } from './db/mongoose';
 
 export class App {
 
     private adminPanel: AdminPanel = new AdminPanel();
     
     async setup() {
-        const { PORT } = process.env;
 
         const db = container.get(DBService)
         await db.connect()
@@ -23,9 +25,7 @@ export class App {
             this.adminPanel.build(app)
         });
 
-        const app = server.build();
-        app.listen(PORT, () => {
-            console.log(`server is running on port ${PORT}`);
-        });
+        return server.build();
+        
     }
 }

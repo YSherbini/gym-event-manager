@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
-import { IEvent } from './IEvent.js';
-import { ITeam } from './ITeam.js';
-import { ICategory } from './ICategory.js';
+import { IEvent } from './IEvent';
+import { ITeam } from './ITeam';
+import { ICategory } from './ICategory';
 
 export interface IRegister extends mongoose.Document {
     _id: string;

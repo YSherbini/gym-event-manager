@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { ITeam } from './ITeam.js';
+import { ITeam } from './ITeam';
 
 export interface IGymOwner extends mongoose.Document {
     _id: string;

@@ -1,9 +1,9 @@
 import mongoose from 'mongoose'
 import 'dotenv/config'
 import bcrypt from 'bcrypt'
-import Team from './team.js'
-import Register from './register.js'
-import { IGymOwner } from '../interfaces/IGymOwner.js'
+import Team from './team'
+import Register from './register'
+import { IGymOwner } from '../interfaces/IGymOwner'
 
 const gymOwnerSchema = new mongoose.Schema({
     name: {

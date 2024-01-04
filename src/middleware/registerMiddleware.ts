@@ -1,7 +1,7 @@
 import express from 'express';
-import { container } from '../container/index.js';
-import { RegisterRepository } from '../repositories/RegisterRepository.js';
-import { IRequest } from '../interfaces/IRequest.js';
+import { container } from '../container/index';
+import { RegisterRepository } from '../repositories/RegisterRepository';
+import { IRequest } from '../interfaces/IRequest';
 
 export const alreadyRegistered = async (req: IRequest, res: express.Response, next: express.NextFunction) => {
     const registerRepository = container.get<RegisterRepository>(RegisterRepository);

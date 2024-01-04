@@ -1,14 +1,14 @@
 import express from 'express';
 import { controller, httpDelete, httpGet, httpPatch, httpPost } from 'inversify-express-utils';
 import { inject } from 'inversify';
-import { IRequest } from '../interfaces/IRequest.js';
-import auth from '../middleware/auth.js';
-import { isValidObjectId } from '../middleware/validate.js';
-import { TeamRepository } from '../repositories/TeamRepository.js';
-import { ITeamQuery, IDuplicateParams, ITeamParams } from '../interfaces/ITeam.js';
-import { RegisterRepository } from '../repositories/RegisterRepository.js';
-import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
-import { EventRepository } from '../repositories/EventRepository.js';
+import { IRequest } from '../interfaces/IRequest';
+import auth from '../middleware/auth';
+import { isValidObjectId } from '../middleware/validate';
+import { TeamRepository } from '../repositories/TeamRepository';
+import { ITeamQuery, IDuplicateParams, ITeamParams } from '../interfaces/ITeam';
+import { RegisterRepository } from '../repositories/RegisterRepository';
+import { GymOwnerRepository } from '../repositories/GymOwnerRepository';
+import { EventRepository } from '../repositories/EventRepository';
 
 @controller('/teams', auth)
 export class TeamController {

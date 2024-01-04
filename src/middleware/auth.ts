@@ -1,8 +1,8 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import GymOwner from '../models/gymOwner.js';
-import { DataStoredInToken } from '../interfaces/jwt.js';
-import { IRequest } from '../interfaces/IRequest.js';
+import GymOwner from '../models/gymOwner';
+import { DataStoredInToken } from '../interfaces/jwt';
+import { IRequest } from '../interfaces/IRequest';
 
 const auth = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {

@@ -1,13 +1,17 @@
-import 'dotenv/config';
+import './config/index'
 import 'reflect-metadata';
 
-import './controllers/index.js'
-
-import { App } from './app.js';
+import { App } from './app';
 
 export async function bootstrap() {
 
-    new App().setup()
+    const { PORT } = process.env;
+
+    const app = await new App().setup()
+
+    app.listen(PORT, () => {
+        console.log(`server is running on port ${PORT}`);
+    });
 
 }
 bootstrap();

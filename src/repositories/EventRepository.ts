@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
-import Event from '../models/event.js';
-import { IEventQuery } from '../interfaces/IEvent.js';
+import Event from '../models/event';
+import { IEventQuery } from '../interfaces/IEvent';
 
 @injectable()
 export class EventRepository {

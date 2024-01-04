@@ -1,7 +1,7 @@
 import express from 'express';
-import { IRequest } from '../interfaces/IRequest.js';
-import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
-import { container } from '../container/index.js';
+import { IRequest } from '../interfaces/IRequest';
+import { GymOwnerRepository } from '../repositories/GymOwnerRepository';
+import { container } from '../container/index';
 
 export const validateEmail = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email } = req.body;

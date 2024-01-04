@@ -1,11 +1,11 @@
 import express from 'express';
 import { controller, httpDelete, httpPost } from 'inversify-express-utils';
-import { GymOwnerRepository } from '../repositories/GymOwnerRepository.js';
-import { checkExistingEmail, validateName, validateEmail, validatePassword } from '../middleware/validate.js';
-import { IGymOwnerAuthParams } from '../interfaces/IGymOwner.js';
+import { GymOwnerRepository } from '../repositories/GymOwnerRepository';
+import { checkExistingEmail, validateName, validateEmail, validatePassword } from '../middleware/validate';
+import { IGymOwnerAuthParams } from '../interfaces/IGymOwner';
 import { inject } from 'inversify';
-import { IRequest } from '../interfaces/IRequest.js';
-import auth from '../middleware/auth.js';
+import { IRequest } from '../interfaces/IRequest';
+import auth from '../middleware/auth';
 
 @controller('/gymOwners')
 export class GymOwnerAuthController {

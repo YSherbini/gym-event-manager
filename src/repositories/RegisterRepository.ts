@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
-import Register from '../models/register.js';
-import { IRegister, IRegisterQuery, IRegisterParams } from '../interfaces/IRegister.js';
+import Register from '../models/register';
+import { IRegister, IRegisterQuery, IRegisterParams } from '../interfaces/IRegister';
 import { ObjectId } from 'mongodb';
 
 @injectable()

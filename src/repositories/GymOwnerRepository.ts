@@ -1,6 +1,6 @@
-import { IGymOwner, IGymOwnerAuthParams, IGymOwnerParams } from '../interfaces/IGymOwner.js';
-import { DataStoredInToken } from '../interfaces/jwt.js';
-import GymOwner from '../models/gymOwner.js';
+import { IGymOwner, IGymOwnerAuthParams, IGymOwnerParams } from '../interfaces/IGymOwner';
+import { DataStoredInToken } from '../interfaces/jwt';
+import GymOwner from '../models/gymOwner';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { injectable } from 'inversify';

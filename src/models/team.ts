@@ -1,4 +1,4 @@
-import { ITeam } from "../interfaces/ITeam.js";
+import { ITeam } from "../interfaces/ITeam";
 import mongoose from "mongoose";
 
 const teamSchema = new mongoose.Schema({

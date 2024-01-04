@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { ICategory } from './ICategory.js';
+import { ICategory } from './ICategory';
 
 export interface IEvent extends mongoose.Document {
     _id: string;
